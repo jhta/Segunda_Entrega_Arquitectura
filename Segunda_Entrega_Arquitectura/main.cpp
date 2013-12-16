@@ -22,7 +22,7 @@ using namespace std;
 #define PI 3.14159
 #define T_LOW 65
 #define T_HIGH 80
-
+HINSTANCE iniciar;
 int importImg(char*);
 void outputImg(void);
 void printFileInfo(BMP);
@@ -341,11 +341,7 @@ void noMax2(void){
 			int n_90=90;
 			int n_135=135;
 			double basura;
-
-			//switch(theta){
-				//case 0:
-					
-
+		
 
 //////ESTE ES EL PRIMER IF :D					
 ///////////////////////////////////////////////////
@@ -443,19 +439,6 @@ void noMax2(void){
 					///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-					/*
-					if(isFirstMax(magArray[i][j],magArray[i+1][j],magArray[i-1][j])){
-						imageArray[i][j] = 0; // black
-					}
-					else{
-						imageArray[i][j] = 255; // white
-					}*/
-				//break;
-				
-				//case 45:
-
-					
-
 //////ESTE ES EL PRIMER IF :D					
 ///////////////////////////////////////////////////
 /////////////////////////////////////////////////////
@@ -533,19 +516,6 @@ void noMax2(void){
 					}
 					///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
-
-					/*
-					if(isFirstMax(magArray[i][j],magArray[i+1][j+1],magArray[i-1][j-1])){
-						imageArray[i][j] = 0; // black
-					}
-					else{
-						imageArray[i][j] = 255; // white
-					}*/
-				
-				//break;
-				
-				//case 90:
-
 
 					
 
@@ -626,17 +596,7 @@ void noMax2(void){
 					///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-					/*
-					if(isFirstMax(magArray[i][j],magArray[i][j+1],magArray[i][j-1])){
-						imageArray[i][j] = 0; // black
-					}
-					else{
-						imageArray[i][j] = 255; // white
-					}*/
-				//break;
-				
-				//case 135:
-					
+	
 
 //////ESTE ES EL PRIMER IF :D					
 ///////////////////////////////////////////////////
@@ -726,19 +686,6 @@ void noMax2(void){
 					///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-					/*
-					if(isFirstMax(magArray[i][j],magArray[i+1][j-1],magArray[i-1][j+1])){
-						imageArray[i][j] = 0; // black
-					}
-					else{
-						imageArray[i][j] = 255; // white
-					}*/
-				//break;
-				
-				//default:
-				  //	cout << "error in nomax()"<< endl;
-				//break;
-			//}
 		}
 	}
 }
@@ -1043,7 +990,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
     wcex.hInstance      = hInstance;
     wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_APPLICATION));
     wcex.hCursor        = LoadCursor(NULL, IDC_ARROW);
-    wcex.hbrBackground  = CreateSolidBrush(RGB(95,188,211));
+    wcex.hbrBackground  = CreateSolidBrush(RGB(229,203,255));
     wcex.lpszMenuName   = NULL;
     wcex.lpszClassName  = szWindowClass;
     wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_APPLICATION));
@@ -1148,27 +1095,68 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	double TiempoAssembly, TiempoC;
 	wstringstream TIEMPOS;
 
-    TCHAR greeting[] = _T("TRANSFORMADA DISCRETA DE FOURIER!");
-
+    TCHAR greeting[] = _T("Algoritmo Canny Edge");
+	static HWND hwndDireccion ;
+	static HWND hwndBienvenida ;
+	//static HWND iniciar ;
     switch (message)
     {
 	case WM_CREATE:
+
+		hwndDireccion = CreateWindow(L"EDIT", L"		INSTRUCCIONES: ", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 50, 410, 20, hWnd, 0, iniciar, NULL);
+		hwndDireccion = CreateWindow(L"EDIT", L"____________________________________________________________", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 70, 410, 20, hWnd, 0, iniciar, NULL);
+		hwndDireccion = CreateWindow(L"EDIT", L" La función del presente programa es por medio del algoritmo", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 90, 410, 20, hWnd, 0, iniciar, NULL);
+		hwndDireccion = CreateWindow(L"EDIT", L" de Canny Edge  es detectar  los  bordes  de  alguna  imagen", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 110, 410, 20, hWnd, 0, iniciar, NULL);
+		hwndDireccion = CreateWindow(L"EDIT", L" seleccionada.", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 130, 410, 20, hWnd, 0, iniciar, NULL);
+		hwndDireccion = CreateWindow(L"EDIT", L" ", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 150, 410, 20, hWnd, 0, iniciar, NULL);
+		hwndDireccion = CreateWindow(L"EDIT", L" Para seleccionar una imagen, se  debe  presionar  el  botón", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 170, 410, 20, hWnd, 0, iniciar, NULL);
+		hwndDireccion = CreateWindow(L"EDIT", L" Examinar, inmediatamente aparecerá la venta para seleccionar", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 190, 410, 20, hWnd, 0, iniciar, NULL);
+		hwndDireccion = CreateWindow(L"EDIT", L" la imagen a transformar, teniendo esto el programa procederá", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 210, 410, 20, hWnd, 0, iniciar, NULL);
+		hwndDireccion = CreateWindow(L"EDIT", L" a realizar los cálculos en C++ y  en  Assambler,  calculando", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 230, 410, 20, hWnd, 0, iniciar, NULL);
+		hwndDireccion = CreateWindow(L"EDIT", L" también sus  respectivos  tiempos.  Luego  se  mostrara  por", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 250, 410, 20, hWnd, 0, iniciar, NULL);
+		hwndDireccion = CreateWindow(L"EDIT", L" pantalla las imágenes respectivas.", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 270, 410, 20, hWnd, 0, iniciar, NULL);
+		hwndDireccion = CreateWindow(L"EDIT", L" ", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 290, 410, 20, hWnd, 0, iniciar, NULL);
+		
+		
+		
+		
+		hwndBienvenida = CreateWindow(L"EDIT", L"  DETECTOR DE BORDES CON ALGORITMO DE CANNY EDGE  ", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 350, 410, 20, hWnd, 0, iniciar, NULL);
+		hwndBienvenida = CreateWindow(L"EDIT", L"__________________________________________________", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 370, 410, 20, hWnd, 0, iniciar, NULL);
+		hwndBienvenida = CreateWindow(L"EDIT", L" Fecha de creación:  16/12/2013", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 390, 410, 20, hWnd, 0, iniciar, NULL);
+		hwndBienvenida = CreateWindow(L"EDIT", L" Versión 1.0.0.0", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 410, 410, 20, hWnd, 0, iniciar, NULL);
+		hwndBienvenida = CreateWindow(L"EDIT", L" Desarrolladores:", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 430, 410, 20, hWnd, 0, iniciar, NULL);
+		hwndBienvenida = CreateWindow(L"EDIT", L" °Jeison Higuita Sanchez", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 450, 410, 20, hWnd, 0, iniciar, NULL);
+		hwndBienvenida = CreateWindow(L"EDIT", L" °Jonathan Vallejo Muñoz", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 470, 410, 20, hWnd, 0, iniciar, NULL);
+		hwndBienvenida = CreateWindow(L"EDIT", L" ", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 490, 410, 20, hWnd, 0, iniciar, NULL);
+		hwndBienvenida = CreateWindow(L"EDIT", L" Universidad Nacional de Colombia", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 510, 410, 20, hWnd, 0, iniciar, NULL);
+		hwndBienvenida = CreateWindow(L"EDIT", L" Arquitectura de Computadores", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 530, 410, 20, hWnd, 0, iniciar, NULL);
+		hwndBienvenida = CreateWindow(L"EDIT", L" Medellín", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 550, 410, 20, hWnd, 0, iniciar, NULL);
+		hwndBienvenida = CreateWindow(L"EDIT", L" ", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 570, 410, 20, hWnd, 0, iniciar, NULL);
+		
+		
+		
+		
+		
+		
 		// Debe insertar la función para buscar archivos (Filtro BMP)
 		// y usarlo como parametro en la función siguiente, como ejemplo pongo
 		// la imagen xy.bmp
 		
+
+
+
 		//Se crea un botón examinar
 		examinar = CreateWindow(L"BUTTON", L"Examinar", WS_TABSTOP|WS_VISIBLE|WS_CHILD|BS_DEFPUSHBUTTON|BS_MULTILINE,  
-								20,50, 90,25, hWnd, NULL, (HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE), NULL);
+								400,300, 100,38, hWnd, NULL, (HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE), NULL);
 		//Se crea un botón instrucciones para mostrar al usuariio como usar el programa
-		Instruc = CreateWindow(L"BUTTON", L"Instrucciones", WS_TABSTOP|WS_VISIBLE|WS_CHILD|BS_DEFPUSHBUTTON|BS_MULTILINE,  
-								20,20, 100,25, hWnd, NULL, (HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE), NULL);
+		/*Instruc = CreateWindow(L"BUTTON", L"Instrucciones", WS_TABSTOP|WS_VISIBLE|WS_CHILD|BS_DEFPUSHBUTTON|BS_MULTILINE,  
+								260,300, 100,38, hWnd, NULL, (HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE), NULL);
 		// Se crea botón About, para dar información respecto al programa 
 		AcercaDe = CreateWindow(L"BUTTON", L"Acerca de", WS_TABSTOP|WS_VISIBLE|WS_CHILD|BS_DEFPUSHBUTTON|BS_MULTILINE,  
-								20,80, 90,25, hWnd, NULL, (HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE), NULL);
-		// se crea el botón salir, para salir del programa
+								400,300, 100,38, hWnd, NULL, (HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE), NULL);
+		*/// se crea el botón salir, para salir del programa
 		Salir = CreateWindow(L"BUTTON", L"Salir", WS_TABSTOP|WS_VISIBLE|WS_CHILD|BS_DEFPUSHBUTTON|BS_MULTILINE,  
-								20,110, 90,25, hWnd, NULL, (HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE), NULL);
+								540,300, 100,38, hWnd, NULL, (HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE), NULL);
 		break;
 	case WM_COMMAND:
 		if(examinar == (HWND)lParam){
@@ -1176,7 +1164,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			bmp.AbrirArchivo(hWnd);
 			if(bandera){
 				bandera= false;
-				MessageBox(hWnd,L"Sea paciente mientras se realizan los cálculos.", L"Please Wait",MB_OK+MB_ICONINFORMATION);
+				//MessageBox(hWnd,L"Sea paciente mientras se realizan los cálculos.", L"Please Wait",MB_OK+MB_ICONINFORMATION);
 
 				GetClientRect(hWnd,&rect);
 				Rectangle((HDC)wParam,rect.left,rect.top,rect.right,rect.bottom);
@@ -1184,7 +1172,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				// Inicia un dispositivo de dibujo
 				hdc=BeginPaint (hWnd,&ps);
 				// Pega la imagen en el dispositivo de dibujo en las coordenadas 0,0
-				bmp.GDIPaint (hdc,130,20,0,0);
+				bmp.GDIPaint (hdc,130,70,0,0);
 				// Se recorre la imagen y se lee el color del punto, si es negro (0 = RGB(0,0,0))
 				// Se pinta con rojo (1000), sino, se deja intacto
 				ROWS=bmp.Height; // Altura de la Imagen
@@ -1217,7 +1205,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				{
 					for (g=0;g<COLUMNS;g++) // Segundo ciclo para llenado de las Matrices dt y dot
 					{
-						cl=GetPixel(hdc,g+130,f+20);	// Función para obtener el pixel en la posición dada
+						cl=GetPixel(hdc,g+130,f+70);	// Función para obtener el pixel en la posición dada
 						B=GetBValue(cl);			// Valor o cantidad de azul en el pixel
 						R=GetRValue(cl);			// Valor o cantidad de rojo en el pixel
 						G=GetGValue(cl);			// Valor o cantidad de verde en el pixel
@@ -1227,19 +1215,30 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						imageArray2[g][f] = Temp;
 					}
 				}
+///////MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+				//CALCULO EN C++
+///////WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+				tc= clock(); // Se inicia a tomar el tiempo que demora haciendo el cálculo
 				gaussianBlur();
 				sobel();
 				noMax();
 				hysteresis();
+				
+				tc= clock() - tc; // Se toma el tiempo y se le resta el que tenía.
+				TiempoC= ((double)tc / ((double)(CLOCKS_PER_SEC)))*1000; // Se pasa Tiempo C++ a milisegundos
+				SetTextColor(hdc,RGB(0,0,0)); // Color para la letra
+				SetBkColor(hdc,RGB(229,203,255));		// Color para el fondo del label de la letra
+				TextOutA(hdc,M+340,(50),"Canny Edge en C++: ",20); // Texto para mostrar la transformada de Fourier en c++
+	
 					for (f=0;f<ROWS;f++)
 				{
 					for (g=0;g<COLUMNS;g++)
 					{
-						SetPixel(hdc,f+M+330,g+N+40,RGB((int)imageArray[f][g],(int)imageArray[f][g],(int)imageArray[f][g]));
-						//SetPixel(hdc,f+2*M+350,g+N+40,RGB((int)(fabs(Qra[f][g])),(int)(fabs(Qra[f][g])),(int)(fabs(Qra[f][g]))));
-						//SetPixel(hdc,f+3*M+370,g+N+40,RGB((int)(fabs(Qia[f][g])),(int)(fabs(Qia[f][g])),(int)(fabs(Qia[f][g]))));
+						SetPixel(hdc,f+M+340,g+N+70,RGB((int)imageArray[f][g],(int)imageArray[f][g],(int)imageArray[f][g]));
 					}
 				}
+				
+
 				//outputImg();
 				imageArray = new double *[COLUMNS] ; // row memory allocation
 				for( int i = 0 ; i < COLUMNS ; i++ ){ // column memory allocation
@@ -1262,283 +1261,49 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						
 					}
 				}
+
+
+	
+///////MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+				//CALCULO EN ASSAMBLER
+///////WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+				
+				ta= clock(); // Se incia a tomar el tiempo que demora en hacer el cálculo.
 				gaussianBlur();
 				sobel();
 				noMax2();
 				hysteresis2();
+				ta= clock() - ta; // Se hace la resta del tiempo en ese preciso momento y el que se tenía de referencia.
+				TiempoAssembly= ((double)ta / ((double)CLOCKS_PER_SEC)) * 1000; // Se pasa TiempoASM a milisegundos
+
+				SetTextColor(hdc,RGB(0,0,0)); // Color para la letra
+				SetBkColor(hdc,RGB(229,203,255));		// Color para el fondo del label de la letra
+				TextOutA(hdc,M+550,(N+50),"Canny Edge en ASM: ",20); // Texto para mostrar la transformada de Fourier en asm
+			
 					for (f=0;f<ROWS;f++)
 				{
 					for (g=0;g<COLUMNS;g++)
 					{
-						SetPixel(hdc,f+M+550,g+N+40,RGB((int)imageArray[f][g],(int)imageArray[f][g],(int)imageArray[f][g]));
-						//SetPixel(hdc,f+2*M+350,g+N+40,RGB((int)(fabs(Qra[f][g])),(int)(fabs(Qra[f][g])),(int)(fabs(Qra[f][g]))));
-						//SetPixel(hdc,f+3*M+370,g+N+40,RGB((int)(fabs(Qia[f][g])),(int)(fabs(Qia[f][g])),(int)(fabs(Qia[f][g]))));
-					}
-				}
-				/*
-				tc= clock(); // Se inicia a tomar el tiempo que demora haciendo el cálculo
-		
-				for (f=0;f<M;f++) // Primer Ciclo para manejo de las matrices Qr(real), Qi(imaginaria), Qm(módulo)
-				{
-					for (g=0;g<N;g++) // Segundo Ciclo para manejo de las matrices Qr(real), Qi(imaginaria), Qm(módulo)
-					{
-						Qr[f][g]=0.0; // Se llena la matriz de reales en ceros
-						Qi[f][g]=0.0; // Se llena la segunda matriz de reales en ceros
-						for (x=0;x<M;x++) // Tercer ciclo para cálculo de los valores en cada posición de las matrices mencionadas
-						{
-							for (y=0;y<N;y++) // Cuarto ciclo para cálculo de los valores en cada posición de las matrices mencionadas
-							{
-								ang = pi_2*((float)(f*x)/(float)M+(float)(g*y)/(float)N);	// Cálculo del ángulo
-						
-								Qr[f][g]+=dt[x][y]*cos(ang); // Llenado del valor en las posiciones de la matriz real, se usa el dt cuyos valores en las mismas posiciones ya fueron hallados
-								Qi[f][g]-=dt[x][y]*sin(ang);	// Llenado del valor en las posiciones de la matriz Imaginaria, se usa el dt cuyos valores en las mismas posiciones ya fueron hallados					
-							}
-					
-						}
-
-						Qr[f][g]=Qr[f][g]/r_m_n; // Se divide cada valor en la posición (f,g) de la matriz por la raiz cuadrada del área de la imagen
-						Qi[f][g]=Qi[f][g]/r_m_n; // Se divide cada valor en la posición (f,g) de la matriz por la raiz cuadrada del área de la imagen
-						Qm[f][g]=sqrt(Qr[f][g]*Qr[f][g]+Qi[f][g]*Qi[f][g]); // Llenado de la matriz módulo, parece ser la magnitud de los números o "vectores" imaginarios a + bi.
-						// Es la raiz cuadrada del valor en (f,g) al cuadrado de la matriz real + el cuadrado del valor en (f,g) de la matriz imaginaria.
-			
-					}
-			
-				}
-
-				tc= clock() - tc; // Se toma el tiempo y se le resta el que tenía.
-				TiempoC= ((double)tc / ((double)(CLOCKS_PER_SEC)))*1000; // Se pasa Tiempo C++ a milisegundos
-				//cout<<endl<<"Tiempo C:"<<TiempoC;
-				SetTextColor(hdc,RGB(212,85,0)); // Color para la letra
-				SetBkColor(hdc,RGB(95,188,211));		// Color para el fondo del label de la letra
-				TextOutA(hdc,M+170,(N/2),"Transformada en C++: ",20); // Texto para mostrar la transformada de Fourier en c++
-				for (f=0;f<M;f++) // Primer ciclo para graficado de las imágenes de la transformada por medio de las matrices anteriormente calculadas
-				{
-					for (g=0;g<N;g++) // Segundo ciclo para graficado de las imágenes de la transformada por medio de las matrices anteriormente calculadas
-					{
-						SetPixel(hdc,f+M+330,g+20,RGB((int)Qm[f][g],(int)Qm[f][g],(int)Qm[f][g]));
-						SetPixel(hdc,f+2*M+350,g+20,RGB((int)(fabs(Qr[f][g])),(int)(fabs(Qr[f][g])),(int)(fabs(Qr[f][g]))));
-						SetPixel(hdc,f+3*M+370,g+20,RGB((int)(fabs(Qi[f][g])),(int)(fabs(Qi[f][g])),(int)(fabs(Qi[f][g]))));
-					}
-				}
-			
-		
-
-				ta= clock(); // Se incia a tomar el tiempo que demora en hacer el cálculo.
-			//Aquí irá cálculo en ASM... RECUERDA INICIALIZAR LAS MATRICES EN 0
-				__asm{
-
-				finit			; Inicializamos la pila
-
-	
-				mov f, 0			; Variable para el manejo de la posición en filas. Número de fila
-					PrimerWhile:	; Primer ciclo, manejo y avance en Filas
-					mov eax,f		; Mueve número de fila actual
-					cmp eax,M		; Compara máximo de filas con el número de fila actual
-					jge FinWhile1	; Salta a etiqueta fin del primer while si el número de fila actual es mayor que el máximo de filas
-	
-					mov ebx, TYPE Qra	; Se mueve el valor en bytes del tamaño del tipo de dato, o declaración, de la matriz a ebx
-					imul ebx, f		; Se multiplica este valor por el número de fila (Para movimiento por filas completas)
-					;mov ecx, ebx	; Se mete en ecx la cuenta de las columnas
-					mov columnasfg,ebx	; Se mueve el valor de la cuenta a columnasfg
-	
-					mov g, 0			; Variable para el manejo de la posición en columnas. Número de columna.
-						SegundoWhile:	; Inicio segundo ciclo para avance de posiciones (Columnas)
-						mov eax, g		; Mueve número de columna actual
-						cmp eax, N		; Compara máximo de columnas con el número de columna actual
-						jge FinWhile2	; Salta a etiqueta fin del segundo while si el número de columna actual es mayor que el máximo de columnas
-		
-						mov ebx, 8	; Se mueve el valor de 8 a ebx, el 8 es por el tamaño en bytes de la declaración QWORD que se utilizará más adelante
-						imul ebx, g	; Se multiplica por g el valor en ebx
-						mov edx, ebx	; se mueve a edx la fila especificada
-		
-						mov ebx, columnasfg		; Movemos a ebx el valor de columnasfg. ebx = (TYPE Qra)*f
-						add ebx, edx			; Movemos a ebx la suma respectiva para la posición (f,g) de la matriz
-						mov FilaColumnaQr,ebx	; se mueve lo de ebx a FilaColumnafg para manejar bien la posición en esa variable
-						mov esi, FilaColumnaQr	; Movemos a esi lo que sería el desplazamiento total en el arreglo, para así manejar este registro
-											; como índice en la matriz
-				
-						fldz					; Metemos a la pila el valor cero... st(0)=0
-						fstp  Qra[qword ptr esi]	; Se saca de la pila a st(0) y se guarda en la posición de memoria [qword ptr Qra + FilaColumnaQr],
-											;la etiqueta qword ptr se usa para referenciar el tipo de memoria (clasificado) que se va a acceder
-				
-						mov ebx, 8			; Se mueve el valor de 8 a ebx, el 8 es por el tamaño en bytes de la declaración QWORD que se utilizará más adelante
-						imul ebx, g			; Se multiplica por el número de columna
-						mov edx, ebx			; se mueve a edx la fila especificada
-		
-						mov ebx, columnasfg		; Movemos el valor de Columnasfg. ebx = (TYPE Qra)*f
-						add ebx, edx			; Movemos a ebx la suma respectiva para la posición (f,g) de la matriz
-						mov FilaColumnaQi,ebx	; se mueve lo de ebx a FilaColumnaQi para manejar bien la posición en esa variable
-						mov esi, FilaColumnaQi	; Se mueve al registro esi el cálculo hecho que nos da como resultado el índice para el desplazamiento total en los arreglos manejados
-						fldz					; Se inserta cero en la pila... st(0)=0
-						fstp Qia[qword ptr esi]	; Se le da a la matriz Qia (imaginaria) el valor de cero en todas sus posiciones.
-		
-		
-						mov x, 0			; Nueva variable para manejo de posiciones, esta viene siendo el número de fila para las próximas matrices a manejar.
-							TercerWhile:	; Tercer ciclo, manejo y avance en Filas
-							mov eax, x	; Mueve número de fila actual.	
-							cmp eax,M		; Compara máximo de filas con el número de fila actual
-							jge FinWhile3	; Salta a etiqueta fin del Tercer while si el número de fila actual es mayor que el máximo de filas
-
-							mov ebx, TYPE dot	; Se mueve al registro ebx, el tipo de dato de la declaración del arreglo. 
-							imul ebx, x		; Se multiplica por el número de fila actual
-							mov ecx, ebx		; Se mete en ecx la cuenta de las columnas
-							mov columnasxy,ecx	; Se mueve la cuenta a columnasxy
-					
-							mov y, 0			; Nueva variable para manejo de posiciones, esta viene siendo el número de columna para las próximas matrices a manejar.
-								CuartoWhile:	; Inicio segundo ciclo para avance de posiciones (Columnas)
-								mov eax, y	; Mueve número de columna actual
-								cmp eax, N	; Compara máximo de columnas con el número de columna actual
-								jge FinWhile4	; Salta a etiqueta fin del segundo while si el número de columna actual es mayor que el máximo de columnas
-
-	
-									FILD f	; Se añade la f actual a la pila con el comando para variables enteras... st(0)=f
-									FILD x	; Se añade la x actual a la pila con el comando para variables enteras... st(0)=x, st(1)=f
-									FMUL		; Se multiplica st(1) * st(0) se almacena en st(1) y se desapila st(0)... st(0)= f*x
-
-									FILD M	; Se añade el máximo de filas a la pila con el comando para variables enteras... st(0)=M, st(0)= f*x 
-									FDIV		; Se divide st(1) entre st(0) se almacena en st(1) y se desapila st(0)... st(0)=f*x/M
-									FILD g	; Se añade la f actual a la pila con el comando para variables enteras... st(0)=g, st(1)=f*x/M
-									FILD y	; Se añade la f actual a la pila con el comando para variables enteras... st(0)=y, st(1)=g, st(2)=f*x/M
-									FMUL		; Se multiplica st(1) * st(0) se almacena en st(1) y se desapila st(0)... st(0)= g*y, st(1)=f*x/M
-									FILD N	; Se añade el máximo de columnas a la pila con el comando para variables enteras... st(0)=N
-									FDIV		; Se divide st(1) entre st(0) se almacena en st(1) y se desapila st(0)... st(0)=y*g/N, st(1)=f*x/M
-									FADD		; Se suma st(1) con st(0), se almacena en st(1) y se desapila st(0)... st(0)=(y*g/N) + (f*x/M)
-									FLDPI	; Se añade pi a la pila... st(0)=pi, st(1)=(y*g/N) + (f*x/M)
-									FADD st(0), st(0)	; Se suma st(0) con el mismo, 2 veces st(0)... st(0)=2pi, st(1)=(y*g/N) + (f*x/M)
-									FMUL		; Se multiplica st(1) * st(0) se almacena en st(1) y se desapila st(0)... st(0)=2pi*[(y*g/N) + (f*x/M)]
-									FSTP ang	; Se inserta el resultado guardado en st(0) en la variable ang y se desapila st(0)... Pila vacía
-	
-									mov ebx, 8	; Se mueve el valor de 8 a ebx, el 8 es por el tamaño en bytes de la declaración QWORD que se utilizará más adelante
-									imul ebx, y	; Se multiplica por el valor en y a ebx
-									mov edx, ebx	; se mueve a edx la fila especificada
-					
-									mov ebx, columnasxy		; movemos el valor anteriormente hallado de columnasxy
-									add ebx, edx			; Movemos a ebx la suma respectiva para la posición (f,g) de la matriz
-									mov FilaColumnaDt,ebx	; se mueve lo de ebx a FilaColumnaQi para manejar bien la posición en esa variable
-									mov esi, FilaColumnaDt	; Movemos la traslación total en el arreglo al registro esi para manejo de índices
-
-									fld dot[qword ptr esi]	; Se añade Dot[FilaColumnaDt] a la pila... st(0)=Dot[FilaColumnaDt]
-									fld ang				; Se añade ang a la pila... st(0)=ang, st(1)=Dot[FilaColumnaDt]
-									FCOS					; Se le saca el coseno a st(0) y se almacena ahí mismo... st(0)=cos(ang), st(1)=Dot[FilaColumnaDt]
-									FMUL					; Se multiplica st(1) * st(0) se almacena en st(1) y se desapila st(0)... st(0)=Dot[FilaColumnaDt]*cos(ang)
-					
-									mov esi, FilaColumnaQr	; Movemos a esi el valor la traslación total en la matriz Qr
-
-									fld Qra[qword ptr esi]	; Se añade Qra[FilaColumnaQr] a la pila... st(0)=Qra[FilaColumnaQr]... st(0)=Qra[FilaColumnaQr], st(1)=Dot[FilaColumnaDt]*cos(ang)
-									FADD					; Se suma st(1) con st(0), se almacena en st(1) y se desapila st(0)... st(0)=Qra[FilaColumnaQr] + Dot[FilaColumnaDt]*cos(ang)
-									fstp Qra[qword ptr esi]	; Se almacena el valor en st(0) en Qra[FilaColumnaQr] y se desapila st(0)... Pila vacía
-	
-									mov esi, FilaColumnaQi	; Movemos a esi el valor la traslación total en la matriz Qi
-
-									fld Qia[qword ptr esi]	; Se añade Qra[FilaColumnaQr] a la pila... st(0)=Qra[FilaColumnaQr]... st(0)=Qra[FilaColumnaQi]
-					
-									mov esi, FilaColumnaDt	; Movemos la traslación total en el arreglo al registro esi para manejo de índices
-
-									fld dot[qword ptr esi]	; Se añade Dot[FilaColumnaDt] a la pila... st(0)=Dot[FilaColumnaDt], st(1)=Qra[FilaColumnaQi]
-									fld ang				; Se añade ang a la pila... st(0)=ang, st(1)=Dot[FilaColumnaDt], st(2)=Qra[FilaColumnaQi]
-									FSIN					; Se le saca el seno al st(0) y se almacena ahí mismo st(0)=sen(ang), st(1)=Dot[FilaColumnaDt], st(2)=Qra[FilaColumnaQi]
-									FMUL					; Se multiplica st(1) * st(0) se almacena en st(1) y se desapila st(0)... st(0)=Dot[FilaColumnaDt]*sen(ang), st(1)=Qra[FilaColumnaQi]
-					
-									FSUB					; Se hace st(1) - st(0) se almacena en st(1) y se desapila st(0)... st(0)= Qra[FilaColumnaQi] - Dot[FilaColumnaDt]*sen(ang)
-
-									mov esi, FilaColumnaQi	; Movemos a esi el valor la traslación total en la matriz Qi
-									fstp Qia[qword ptr esi]	; Se almacena el valor en st(0) en Qia[FilaColumnaQi] y se desapila st(0)... Pila vacía
-
-								inc y				; Se incrementa en 1 a y
-								jmp CuartoWhile		; Salta a la etiqueta CuartoWhile para empezar de  nuevo el cuarto ciclo while
-								FinWhile4:			; Etiqueta para el final del cuarto while
-		
-		
-							inc x					; Se incrementa en 1 a x
-							jmp TercerWhile			; Salta a la etiqueta TercerWhile para empezar de nuevo el Tercer ciclo while
-							FinWhile3:				; Etiqueta para el final del Tercer while
-			
-			
-						mov esi, FilaColumnaQr			; Movemos a esi el valor la traslación total en la matriz Qr
-						fld Qra[qword ptr esi]			; Se añade Qra[FilaColumnaQr] a la pila... st(0)=Qra[FilaColumnaQr]
-						fld r_m_n						; Se añade la variable r_m_n a la pila... st(0)= r_m_n, st(1)=Qra[FilaColumnaQr]
-						FDIV							; Se divide st(1) entre st(0) se almacena en st(1) y se desapila st(0)... st(0)=Qra[FilaColumnaQr]/r_m_n
-						fstp Qra[qword ptr esi]			; Se almacena en Qra[FilaColumnaQr] el valor de st(0) y se desapila... Pila vacía.
-		
-						mov esi, FilaColumnaQi			; Movemos a esi el valor la traslación total en la matriz Qi
-
-						fld Qia[qword ptr esi]			; Se añade Qia[FilaColumnaQi] a la pila... st(0)=Qia[FilaColumnaQi]
-						fld r_m_n						; Se añade la variable r_m_n a la pila... st(0)= r_m_n, st(1)=Qia[FilaColumnaQi]
-						FDIV							; Se divide st(1) entre st(0) se almacena en st(1) y se desapila st(0)... st(0)=Qia[FilaColumnaQi]/r_m_n
-						fstp Qia[qword ptr esi]			; Se almacena en Qra[FilaColumnaQr] el valor de st(0) y se desapila... Pila vacía.
-
-						mov esi, FilaColumnaQr			; Movemos a esi el valor la traslación total en la matriz Qr
-
-						fld Qra[qword ptr esi]			; Se añade Qra[FilaColumnaQr] a la pila... st(0)=Qra[FilaColumnaQr] 
-						FMUL st(0), st(0)				; Se eleva st(0) al cuadrado... st(0)=(Qra[FilaColumnaQr])^2
-		
-						mov esi, FilaColumnaQi			; Movemos a esi el valor la traslación total en la matriz Qi
-
-						fld Qia[qword ptr esi]			; Se añade Qia[FilaColumnaQi] a la pila... st(0)=Qia[FilaColumnaQi] 
-						FMUL st(0), st(0)				; Se eleva st(0) al cuadrado... st(0)=(Qia[FilaColumnaQi])^2
-		
-						FADD							; Se suma st(1) + st(0) se almacena en st(1) y se desapila en st(0)... st(0)=(Qra[FilaColumnaQr])^2 + (Qia[FilaColumnaQi])^2
-						FSQRT						; Se le saca raiz cuadrada a st(0) y se almacena ahí mismo... st(0) = [(Qra[FilaColumnaQr])^2 + (Qia[FilaColumnaQi])^2]^(1/2)
-		
-						mov ebx, 8					; Se mueve el valor de 8 a ebx, el 8 es por el tamaño en bytes de la declaración QWORD que se utilizará más adelante
-						imul ebx, g					; Se multiplica por g el valor en ebx
-						mov edx, ebx					; se mueve a edx la fila especificada
-		
-						mov ebx, columnasfg				; Se mueve a ebx el valor en columnasfg
-						add ebx, edx					; Movemos a ebx la suma respectiva para la posición (f,g) de la matriz
-						mov FilaColumnaQm,ebx			; se mueve lo de ebx a FilaColumnaQi para manejar bien la posición en esa variable
-						mov esi, FilaColumnaQm			; Movemos al esi el valor en FilaColumnaQm para el manejo de los índices
-
-						fstp Qma[qword ptr esi]			; Se almacena en Qma[FilaColumnaQm] el valor en st(0) y se desapila... Pila vacía
-				
-						inc g				; Se incrementa g en 1	
-						jmp SegundoWhile		; Salta a la etiqueta SegundoWhile para reiniciar el segundo ciclo while
-						FinWhile2:			; Etiqueta para el final del Segundo while
-		
-					inc f					; Se incrementa f en 1
-					jmp PrimerWhile			; Salta a la etiqueta SegundoWhile para reiniciar el Primer ciclo while
-					FinWhile1:				; Etiqueta para el final del Primer while
-			
-				}
-				ta= clock() - ta; // Se hace la resta del tiempo en ese preciso momento y el que se tenía de referencia.
-				TiempoAssembly= ((double)ta / ((double)CLOCKS_PER_SEC)) * 1000; // Se pasa TiempoASM a milisegundos
-
-				SetTextColor(hdc,RGB(0,128,128)); // Color para la letra
-				SetBkColor(hdc,RGB(95,188,211));		// Color para el fondo del label de la letra
-				TextOutA(hdc,M+170,(N/2)+N+20,"Transformada en ASM: ",20); // Texto para mostrar la transformada de Fourier en asm
-			//Como ya terminó el Cálculo lo mostramos el resultado en assembly.
-		
-				for (f=0;f<M;f++)
-				{
-					for (g=0;g<N;g++)
-					{
-						SetPixel(hdc,f+M+330,g+N+40,RGB((int)Qma[f][g],(int)Qma[f][g],(int)Qma[f][g]));
-						SetPixel(hdc,f+2*M+350,g+N+40,RGB((int)(fabs(Qra[f][g])),(int)(fabs(Qra[f][g])),(int)(fabs(Qra[f][g]))));
-						SetPixel(hdc,f+3*M+370,g+N+40,RGB((int)(fabs(Qia[f][g])),(int)(fabs(Qia[f][g])),(int)(fabs(Qia[f][g]))));
+						SetPixel(hdc,f+M+550,g+N+70,RGB((int)imageArray[f][g],(int)imageArray[f][g],(int)imageArray[f][g]));
 					}
 				}
 
-				//cout<<endl<<"tiempo ASM: "<<TiempoAssembly;
-
-			
 				// Se llena el buffer para mostrar por un messageBox
 				TIEMPOS<<"Tiempo C++: "<<TiempoC<<" milisegundos"<<endl
 					<<"Tiempo ASM: "<<TiempoAssembly<<" milisegundos"<<endl
-					<<"Diferencia: "<<abs(TiempoC-TiempoAssembly)<<" milisegundos"; 
+					<<"Diferencia: "<<abs(TiempoC-TiempoAssembly)<<" milisegundos";
+
 
 				MessageBox(NULL,TIEMPOS.str().c_str(),_T("Tiempos"),NULL);
-				*/
+				
+				
+
+
+
 				EndPaint(hWnd, &ps);
 		}
 		}else if(Salir == (HWND)lParam){
 			DestroyWindow(hWnd);
-		}else if(Instruc == (HWND)lParam){
-			// Se crea una variable llamada mensaje con lo que irá dentro de el botón Instrucciones.
-			TCHAR Mensaje[]=_T("BIENVENIDO\n\nEste programa está diseñado para calcular la transformada discreta de Fourier\nen imágenes de mapas de bits (Bitmap-BMP).\n\nEl programa consta de varias operaciones, que están comandadas por los botones\nen la pantalla principal, estos son:\n\nExaminar: Abre la pantalla de búsqueda para cargar el archivo que se desee,\n	una vez escogido es montado en la pantalla principal y comienza\n	a hacer los cálculos, a mostrar las transformadas y los tiempos \n	de las mismas.\n\nAcerca de: Muestra una ventana de mensaje con los créditos del programa.\n\nSalir: Termina el programa y despliega un mensaje de despedida.");
-			MessageBox(NULL,Mensaje,_T("Instrucciones"),NULL);
-		}else if(AcercaDe == (HWND)lParam){
-			TCHAR Mensaje2[]=_T("Transformada Bidimensional Discreta de Fourier\n	Fecha de Creación Junio/10/2013\n	Versión 1.0.2.32\n	Arquitectura de computadores\n	Semestre 01-2013\n	Desarrolladores:\n		Cristian Camilo Morales Jiménez\n		Steven Velasquez Chancí\n\n	© 2013 Arquitecture");
-			MessageBox(NULL,Mensaje2,_T("Acerca De..."),NULL);
 		}
 	    break;
     case WM_PAINT:
@@ -1548,8 +1313,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     
     case WM_DESTROY:
                 MessageBox(NULL,
-            _T("FIN DEL PROGRAMA "),
-            _T("Mensaje"),
+            _T("El progama se a ejecutado con exito"),
+            _T("Fin"),
             NULL);
         PostQuitMessage(0);
         break;
