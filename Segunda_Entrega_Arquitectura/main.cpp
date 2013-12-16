@@ -12,7 +12,7 @@
 #include<cstdlib>
 #include "EasyBMP.h"
 #include "stdafx.h"
-
+#include <cstring>
 using namespace std;
 
 
@@ -54,6 +54,16 @@ double  **thetas2;
 double** magArray;
 double** magArray2;
 float doscincuenta;
+double estadistica[100];
+int INF= (1<<20);
+
+int cont=0;
+double sum=0;
+double sumASM=0;
+double sumC=0;
+double miniASM=INF;
+
+double miniC=INF;
 
 unsigned int ROWS;
 unsigned int COLUMNS;
@@ -1088,7 +1098,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     HDC hdc;
     //variables para botones y barra de menu
     int winMenuId, winMenuEvent;
-    static HWND examinar, AcercaDe, Instruc, Salir;
+    static HWND examinar, estadisticas, Instruc, Salir;
     RECT rect;
     	static CRaster bmp;
 
@@ -1148,10 +1158,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		//Se crea un botón examinar
 		examinar = CreateWindow(L"BUTTON", L"Examinar", WS_TABSTOP|WS_VISIBLE|WS_CHILD|BS_DEFPUSHBUTTON|BS_MULTILINE,  
-								400,300, 100,38, hWnd, NULL, (HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE), NULL);
+								260,300, 100,38, hWnd, NULL, (HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE), NULL);
 		/// se crea el botón salir, para salir del programa
 		Salir = CreateWindow(L"BUTTON", L"Salir", WS_TABSTOP|WS_VISIBLE|WS_CHILD|BS_DEFPUSHBUTTON|BS_MULTILINE,  
+								400,300, 100,38, hWnd, NULL, (HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE), NULL);
+		estadisticas = CreateWindow(L"BUTTON", L"Estadisticas", WS_TABSTOP|WS_VISIBLE|WS_CHILD|BS_DEFPUSHBUTTON|BS_MULTILINE,  
 								540,300, 100,38, hWnd, NULL, (HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE), NULL);
+		
 		break;
 	case WM_COMMAND:
 		if(examinar == (HWND)lParam){ //SI PRESIONA EL BOTON DE EXAMINAR
@@ -1286,7 +1299,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				TIEMPOS<<"Tiempo C++: "<<TiempoC<<" milisegundos"<<endl
 					<<"Tiempo ASM: "<<TiempoAssembly<<" milisegundos"<<endl
 					<<"Diferencia: "<<abs(TiempoC-TiempoAssembly)<<" milisegundos";
-
+				sum+=abs(TiempoC-TiempoAssembly);
+				sumASM+=TiempoAssembly;
+				sumC+=TiempoC;
+				cont++;
+				miniASM=min(miniASM,TiempoAssembly);
+				miniC=min(miniC,TiempoC);
 				//MUESTRA LOS TIEMPOS
 				MessageBox(NULL,TIEMPOS.str().c_str(),_T("Tiempos"),NULL);
 				
@@ -1299,7 +1317,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}else if(Salir == (HWND)lParam){
 			DestroyWindow(hWnd);
 		}
-	    break;
+		else if(estadisticas == (HWND)lParam){
+			if(cont==0){
+				wstringstream IMPRIMIR;
+				IMPRIMIR<<"Por el momento no se a ingresado ningun dato "<<endl;
+				MessageBox(NULL,IMPRIMIR.str().c_str(),_T("Estadisticas"),NULL);
+			}else{
+				double res=sum/((double)cont);
+				wstringstream IMPRIMIR;
+				IMPRIMIR<<"Promedio de diferencias: "<<res<<" milisegundos"<<endl
+					<<"Promedio en ASM: "<<(sumASM/((double)cont ))<<" milisegundos"<<endl
+					<<"Promedio en C++: "<<(sumC/((double)cont ))<<" milisegundos"<<endl
+					<<"Tiempo ASM minimo: "<<miniASM<<" milisegundos"<<endl
+					<<"Tiempo C++ minimo: "<<miniC<<" milisegundos"<<endl;
+					
+
+						MessageBox(NULL,IMPRIMIR.str().c_str(),_T("Estadisticas"),NULL);
+			
+
+
+			}
+		}
+	    break; 
     case WM_PAINT:
 		hdc=BeginPaint (hWnd,&ps);
 		EndPaint(hWnd, &ps);
