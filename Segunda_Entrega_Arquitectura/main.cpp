@@ -379,21 +379,21 @@ void noMax2(void){
 						mov eax, theta
 						mov ebx, n_0
 						cmp eax, ebx
-						je caso0   ; COMPARA TETHA CON 0 PARA ENTRAR AL PRIMER CASO
+						je caso0   ;// COMPARA TETHA CON 0 PARA ENTRAR AL PRIMER CASO
 
 						
 						mov ebx, n_45
 						cmp eax, ebx
-						je caso45   ; COMPARA TETHA CON 45 PARA ENTRAR AL PRIMER CASO
+						je caso45   ;// COMPARA TETHA CON 45 PARA ENTRAR AL PRIMER CASO
 
 
 						mov ebx, n_90
 						cmp eax, ebx
-						je caso90   ; COMPARA TETHA CON 90 PARA ENTRAR AL PRIMER CASO
+						je caso90   ;// COMPARA TETHA CON 90 PARA ENTRAR AL PRIMER CASO
 
 						mov ebx, n_135
 						cmp eax, ebx
-						je caso135   ; COMPARA TETHA CON 0 PARA ENTRAR AL PRIMER CASO
+						je caso135   ;// COMPARA TETHA CON 0 PARA ENTRAR AL PRIMER CASO
 
 
 						caso0:
@@ -775,54 +775,54 @@ void noMax2(void){
 //WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
 
   void hysteresis2(void){
-	   doscincuenta=255.0;
-	  T_LOWA=65;
-	  T_HIGHA=80;
-	  cout<<"ROWS-2 "<<ROWS-2<<endl;
-	  cout<<"COLUMNS-2 "<<COLUMNS-2<<endl;
+	   doscincuenta=255.0; //constante utilizada parda realizar los procedimientos
+	  T_LOWA=65;   //asignacion inicial de variables
+	  cout<<"ROWS-2 // "<<ROWS-2<<endl;  //impresiones para verificar funcionamiento de la aplicación
+	  cout<<"COLUMNS-2 // "<<COLUMNS-2<<endl; //impresiones para verificar funcionamiento de la aplicación
+	  T_HIGHA=80;  //asignacion inicial de variables
 	  _asm{
-		  mov j,2
-while1:
+		  mov j,2 ;//se inicia la j en 2, el for comienza desde 2 y termina en ROWS-2
+while1:   ;// los for de esta funcion fueron implementados como whiles,esto debido a lo grande que son y la cantidad de operaciones que realizan
 	  }
-	  cout<<"j "<<j<<endl;
+	  cout<<"j "<<j<<endl;  //impresiones de prueba
 	  _asm{
 	mov eax,j
 	mov ebx,ROWS
 	sub ebx,2
-	cmp eax,ebx
-	jge finwhile1
-	mov i,2 ;NO OLVIDAR DECLARAR I Y J en c++
-while2:
+	cmp eax,ebx    ;//aca se encuentran las comparaciones para verificar si se debe salir del while o no
+	jge finwhile1   ; //salta si cumple la co
+	mov i,2 ;//la i comienza en 2, el for va desde 2 hata COLUMNS-2
+while2:  ;//este for tambien fue implementando como un while
 	  }
-	  cout<<"i "<<i<<endl;
+	  cout<<"i "<<i<<endl;  // impresiones de verificacion
 	  _asm{
 		mov eax,i
 		mov ebx,COLUMNS
 		sub ebx,2
-		cmp eax,ebx
-		;jmp finwhile2
+		cmp eax,ebx   ; //comparaciones para verificar si se debe terminar el procedimiento o no
+		
 		jge finwhile2
-		;mov eax,500
+		
 		
 			mov esi,i
 		mov edi,j
 		mov edx,type magArray
 		imul edi,type double ;//multiplicar edi por el tipo del dato del arreglo
-		imul esi,edx
+		imul esi,edx  ;// manejo de indices para poder acceder a ciertas posiciones de la matriz
 		;fild T_LOWA
 		;fld [qword ptr magArray +esi+edi]
 		;fcomi ST(0),ST(1)
-		;jge finsi1
-		;finit
-		;fld doscincuenta ;OJOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+		;jge finsi1                   ;//estas lineas verifican ciertas condiciones para poder cambiar
+		;finit                        ;//ciertas posiciones de la matriz imageArray por el numero 255
+		;fld doscincuenta 
 		;fstp [qword ptr magArray +esi+edi]
 		;finsi1:
 		
 	  }
 	  if(magArray[i][j]<T_LOW){
-		  imageArray[i][j]=255;
+		  imageArray[i][j]=255;   //lineas de apoyo en c++ para verficiar condiciones
 	  }
-	  if(magArray[i][j]>T_HIGH){
+	  if(magArray[i][j]>T_HIGH){  //lineas de apoyo en c++ para verificar condiciones
 		  imageArray[i][j]=0;
 	  }
 	  _asm{
@@ -836,31 +836,31 @@ while2:
 		fld [qword ptr magArray +esi+edi]
 		fcomi ST(0),ST(1)
 		jg finsi3
-		mov greaterFounda,0
-		mov betweenFounda,0 ;NO OLVIDAR DECLARAR ESTAS DOS
+		mov greaterFounda,0   ; //la unica forma de entrar a realizar los siguientes procedimientos
+		mov betweenFounda,0 ;// es que cumpla estas condiciones if(magArray[i][j] >= T_LOW && magArray[i][j] <= T_HIGH){
 		mov eax,0  
-		sub eax,1
-		mov m,eax  ; no olvidar declarar m
+		sub eax,1  ;//esta línea marca el inicio de la variable m, la cual comienza en -1 y se utiliza en el siguiente while
+		mov m,eax  ; 
 		while3:
 		mov eax,m
 		mov ebx,2
-		cmp eax,ebx
+		cmp eax,ebx   ;//comparaciones para verificar y controlar la ejecucion del while, para que no se vaya a un cico infinito
 		jge finwhile3
 		
 		mov eax,0  
 		sub eax,1
-		mov n,eax  ; no olvidar declarar m
+		mov n,eax  ; //inicializacion de la variable n , comienza en -1
 		while4:
 		mov eax,n
 		mov ebx,2
-		cmp eax,ebx
+		cmp eax,ebx  ;//comparaciones de control del ciclo while, para que no se vaya a un ciclo infinito
 		jge finwhile4
 		
 		mov eax,i
 		add eax,m
 		mov esi,eax
-		mov edx,type magArray
-		imul esi,edx
+		mov edx,type magArray ; //manejo de los indices de la matriz
+		imul esi,edx   ;// manejo de los indices de la matriz
 		mov eax,j
 		add eax,n
 		mov edi,eax
@@ -868,7 +868,7 @@ while2:
 		finit
 		fild T_HIGHA
 		fld [qword ptr magArray +esi+edi]
-		fcomi ST(0),ST(1)
+		fcomi ST(0),ST(1) ; //realiza la siguiente comparacion if(magArray[i+m][j+n] > T_HIGH) {
 		jle finsi4
 		mov esi,i
 		mov edi,j
@@ -877,8 +877,8 @@ while2:
 		imul esi,edx
 		finit
 		fldz
-		fstp [qword ptr imageArray +esi+edi]
-		mov greaterFounda,1
+		fstp [qword ptr imageArray +esi+edi] ;// realiza la siguiente asignacion imageArray[i][j] = 0;
+		mov greaterFounda,1 ;//la variable greaterFounda queda en True, equivalente a quedar en 1
 		finsi4:
 		
 		
@@ -891,99 +891,80 @@ while2:
 		fld [qword ptr magArray +esi+edi]
 		fcomi ST(0),ST(1)
 		jle finsi5
-		finit
-		fild T_HIGHA
-		fld [qword ptr magArray +esi+edi]
-		fcomi ST(0),ST(1)
-		jge finsi5
-		mov betweenFounda,1
-		
-		finsi5:
-		
-		inc n
-		jmp while4
-		finwhile4:
-		inc m
+		 la variable m en 1, esto para el manejo del ciclo while
 		jmp while3
 		finwhile3:
-		
-		
+	
 		mov eax,0
 		cmp eax,greaterFounda
 		jl finsi6
 		mov eax,1
-		cmp eax,betweenFounda
+		cmp eax,betweenFounda   ;//este bloque de codigo realiza las siguientes comparaciones if(!greaterFound && betweenFound) {
 		jg finsi6
-		;*******************************************
+
+		mov eax,0    ;// a continuacion, si cumplio con las condiciones anteriores procedera a entrar en un doble ciclo while
+		sub eax,2finit
+		fild T_HIGHA
+		fld [qword ptr magArray +esi+edi]  ;// este bloque de codigo realiza la siguiente comparacion if(magArray[i][j] > T_LOW && magArray[i][j] < T_HIGH)
+		fcomi ST(0),ST(1)
+		jge finsi5
+		mov betweenFounda,1 ;//asigna a betweenFounda un uno, equivalente a asignarle un True como en el caso del algoritmo de C++
 		
+		finsi5:
 		
-		mov eax,0  
-		sub eax,2
-		mov m,eax  ; no olvidar declarar m
+		inc n  ;//incremento de variable n en 1, esto para el manejo del ciclo while
+		jmp while4
+		finwhile4:
+		inc m ://incremento de
+		mov m,eax  ; //asgina un valor inicial a m para así poder iniciar con el ciclo while
 		while5:
 		mov eax,m
 		mov ebx,3
-		cmp eax,ebx
+		cmp eax,ebx ;//comparaciones para controlar la ejecucion del ciclo while, se realiza hasta que sea mayor o igual a 3
 		jge finwhile5
-		
+
 		mov eax,0  
 		sub eax,2
-		mov n,eax  ; no olvidar declarar m
+		mov n,eax  ; //asginacion inicial de la variable n para la ejecucion del ciclo while6
 		while6:
 		mov eax,n
 		mov ebx,3
-		cmp eax,ebx
+		cmp eax,ebx ;//comparaciones para control del ciclo while
 		jge finwhile6
 		
 		mov eax,i
 		add eax,m
 		mov esi,eax
-		mov edx,type magArray
-		imul esi,edx
+		mov edx,type magArray ;//manejo de indices de la matriz
+		imul esi,edx ;//manejo de indices de la matriz
 		mov eax,j
 		add eax,n
 		mov edi,eax
-		imul edi,type double
+		imul edi,type double ;//manejo de indices de la matriz
 		finit
 		fild T_HIGHA
 		fld [qword ptr magArray +esi+edi]
-		fcomi ST(0),ST(1)
+		fcomi ST(0),ST(1) ;// esto realiza la siguiente comparacion if(magArray[i+m][j+n] > T_HIGH)
 		jle finsi7
-		
-		mov greaterFounda,1
+		mov greaterFounda,1 ;//asigna a esta variable un 1 si cumplió con la condicion anterior, equivalente en c++ a asignar True
 		finsi7:
-		
-		
-		
-		
-		inc n
+		inc n ;// incrementa n para poder continuar con el flujo del ciclo
 		jmp while6
 		finwhile6:
-		inc m
+		inc m ;//incrementa a m para continuar con el flujo del ciclo
 		jmp while5
 		finwhile5:
-		
-		
-		;*******************************************
 		finsi6:
-		
-		
 		finsi3:
-		
-		
-		;///////////////////////////////////////////////////////////////////////
-
-		
-		
-		inc i
+		inc i ;//incremento de la variable i para continuar con el ciclo while
 		jmp while2
 	finwhile2:
-	inc j
+	inc j ;//incremento de la variable j para continuar con el ciclo while mas externo
 	  }
-	 // cout<<"i "<<i<<endl;
+	 // cout<<"i "<<i<<endl; //impresiones para verificacion y depuracion del algoritmo
 	  _asm{
 	jmp while1
-finwhile1:
+finwhile1: ;//fin el while mas externo, cuando termine termina la ejecucion de esta función
 	  }
   }
 class CRaster {
