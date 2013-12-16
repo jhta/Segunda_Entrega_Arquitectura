@@ -1,6 +1,3 @@
-
-#include "EasyBMP.h"
-#include "stdafx.h"
 #include <windows.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,39 +8,20 @@
 #include <cstdio>
 #include <ctime>
 #include <sstream>
+#include<iostream>
+#include<cstdlib>
+#include "EasyBMP.h"
+#include "stdafx.h"
 
 using namespace std;
 
 
 #define pi_2 (4.0 * asin(1.0))
 
-
-//////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////
-//VARIBLES UTILIZADAS 
-
 #define MAX_SIZE 5
 #define PI 3.14159
 #define T_LOW 65
 #define T_HIGH 80
-
-
-int **imageArray;
-float  **thetas;
-int** magArray;
-
-unsigned int ROWS;
-unsigned int COLUMNS;
-char DEPTH;
-int N,M;
-int R,C;
-
-double dt[1024][1024],Qr[1024][1024],Qi[1024][1024],Qm[1024][1024]; 
-
-
-//////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////
-//FUNCIONES UTILIZADAS
 
 int importImg(char*);
 void outputImg(void);
@@ -53,116 +31,72 @@ void gaussianBlue(void);
 void sobel(void);
 void noMax(void);
 void hysteresis(void);
-bool isFirstMax(int , int , int );
+void hysteresis2(void);
+bool isFirstMax(double , double , double );
 int getOrientation(float);
 bool isBetween(float, float, float, float, float);
 
-//////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////
+
+int T_LOWA;
+int T_HIGHA;
+int i,j,m,n;
+int greaterFounda;
+int betweenFounda;
+double **imageArray;
+double **imageArray2;
+double  **thetas;
+double  **thetas2;
+double** magArray;
+double** magArray2;
+float doscincuenta;
+
+unsigned int ROWS;
+unsigned int COLUMNS;
+char DEPTH;
+
+
+// Global variables
+
+int N,M;
+int R,C;
+
+double dt[1024][1024],Qr[1024][1024],Qi[1024][1024],Qm[1024][1024]; 
+
 // The main window class name.
 static TCHAR szWindowClass[] = _T("BMPLoad");
 
-//////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////
 // The string that appears in the application's title bar.
 static TCHAR szTitle[] = _T("Transformada Bidimensional Discreta de Fourier");
 
 HINSTANCE hInst;
 
-//////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////
 // Forward declarations of functions included in this code module:
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 
-//////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////
 //Variables propias para manejo de botones
 double   dot[1024][1024],Qra[1024][1024],Qia[1024][1024],Qma[1024][1024];
 OPENFILENAME exam ;
 wchar_t szFile[MAX_PATH] ;
 char *FileNameBufo=(char *)malloc(MAX_PATH);
-int i; 
 bool bandera= false; // Esta bandera es un booleano que controla la carga de archivos. En caso de ser falsa nocarga nada, si es verdadera carga un archivo.
 
-//*************************************************************************************************************************************
-//*************************************************************************************************************************************
-//*************************************************************************************************************************************
-//*********************************************DEFINICION DE FUNCIONES******************************************************************
 
 
+/*HWND sHwnd;
+ 
+void SetWindowHandle(HWND hwnd){
+    sHwnd= hwnd;
+}*/
 
-//*****************************
-// prints size of img and depth of bits
-//*****************************/
-
+// **********
+// class CRaster
+//   - Clase generica para imagenes BMP raster.
 void printFileInfo(BMP image){
   cout << endl << "File info:" << endl;
   cout << image.TellWidth() << " x " << image.TellHeight()
        << " at " << image.TellBitDepth() << " bpp" << endl << endl;
 }
-
-
-//***************************** 
-// uses the EasyBMP libary to import a bmp image
-// and then takes the RGB and calulates a brightness
-// assigning it to another array that we can use for 
-// further manipulation
-// The function essentially loads the file of the name given
-// and then desaturates it
-//*****************************
-
-int importImg(char* filename){
-  BMP InputIMG;
-  cout << "Starting BMP final code" << endl;
-  cout << "Open File: " << filename << endl;
-  if(!InputIMG.ReadFromFile(filename)){
-    cout << "Invalid File Name..." << endl;
-    return EXIT_FAILURE;
-  }
-
-  printFileInfo(InputIMG);
-  COLUMNS = InputIMG.TellWidth();  // num cols
-  ROWS = InputIMG.TellHeight(); // num rows
-  DEPTH = InputIMG.TellBitDepth();
-  
-  //allocate Memory
-  imageArray = new int *[COLUMNS] ; // row memory allocation
-  for( int i = 0 ; i < COLUMNS ; i++ ){ // column memory allocation
-    imageArray[i] = new int[ROWS];
-  }
-
-  thetas = new float *[COLUMNS];
-  for(int i = 0; i < COLUMNS; i++) {
-    thetas[i] = new float[ROWS];
-  }
-
-  magArray = new int *[COLUMNS];
-  for(int i=0; i < COLUMNS; i++) {
-    magArray[i] = new int[ROWS];
-  }
-
-  int Temp;
-  cout<< "Saving Brightness values" << endl;
-  for( int j=0 ; j < ROWS ; j++)
-    {
-      for( int i=0 ; i < COLUMNS ; i++)
-	{
-	  Temp = (int) floor( 0.299*InputIMG(i,j)->Red +
-			      0.587*InputIMG(i,j)->Green +
-			      0.114*InputIMG(i,j)->Blue );
-	  imageArray[i][j] = Temp;
-	}
-    }
-
-}
-
-
-//*******************
-// outputs the image to a bmp
-// by writing the value of the array we have 
-// to each of RG, and B
-//*******************
 void outputImg(void){
   //setup Output IMG
   BMP OutputIMG;
@@ -185,6 +119,23 @@ void outputImg(void){
   
   OutputIMG.WriteToFile("Output.bmp");
   cout << "\n**** NOW GO OPEN Output.BMP ******" << endl;
+}
+//***************************
+// convolve is a general helper funciton that applies a convolution
+// to the image and then returns the weighted sum so that
+// it can replace whatever pixel we were just analyzing
+//**************************
+float convolve(int con[][MAX_SIZE], int dim,  float divisor, int i, int j) {
+    int midx = dim/2;
+    int midy = dim/2;
+
+    float weightedSum = 0;
+    for(int x = i-midx; x < i + dim-midx; x++) {
+      for(int y = j-midy; y < j + dim-midy; y++) {
+	weightedSum += divisor*(double)(con[x-i+midx][y-j+midy]*imageArray[x][y]);
+      }
+    }
+    return weightedSum;
 }
 
 
@@ -212,28 +163,6 @@ void gaussianBlur(void) {
       imageArray[i][j] = (int)sum;
     }
   }
-}
-
-
-
-
-
-//***************************
-// convolve is a general helper funciton that applies a convolution
-// to the image and then returns the weighted sum so that
-// it can replace whatever pixel we were just analyzing
-//**************************
-float convolve(int con[][MAX_SIZE], int dim,  float divisor, int i, int j) {
-    int midx = dim/2;
-    int midy = dim/2;
-
-    float weightedSum = 0;
-    for(int x = i-midx; x < i + dim-midx; x++) {
-      for(int y = j-midy; y < j + dim-midy; y++) {
-	weightedSum += divisor*(double)(con[x-i+midx][y-j+midy]*imageArray[x][y]);
-      }
-    }
-    return weightedSum;
 }
 
 
@@ -274,12 +203,10 @@ void sobel(void) {
   }
 }
 
-
-
 //***************************
 // helper function that returns true if a>b and c
 //***************************
-bool isFirstMax(int a, int b, int c){
+bool isFirstMax(double a, double b, double c){
   if(a>b && a>c){
        return true;
   }
@@ -324,55 +251,6 @@ bool isBetween(float arg, float a, float b, float c, float d) {
 //*****************************
 void noMax(void){
 	int theta = 0;
-	/*
-	int j=1,i=1;
-	float auxMatriz[ROWS*COLUMNS];
-	for (int k=1, k<ROWS-1;k++){
-		for(int p=1; p<COLUMNS-1;p++){
-			auxMatriz[(i*j)+j]=(float)thetas[i][j];
-		}
-	
-	}
-
-
-	int guardaEcx=0;
-	int guardaEsi=0;
-
-	//fist para retornar un entetro
-	
-
-	__asm{
-	mov eax, ROWS
-	sub eax,1
-	mov ecx,eax
-	mov esi,1
-
-	for1:
-		mov guardaEcx, ecx
-		mov guardaEsi, esi
-;****asigno valor a a clumna
-		mov eax, COLUMNS
-		sub eax,1
-		mov ecx,eax
-		mov esi,1
-
-		for2:
-			
-			fld auxMatriz
-			fist theta
-
-
-			
-			inc esi
-		loop for2
-
-		inc esi
-	loop for1
-
-
-    }*/
-
-	
 	for( int j=1 ; j < ROWS-1 ; j++)
 	 {
 	    for( int i=1 ; i < COLUMNS-1 ; i++)
@@ -400,19 +278,19 @@ void noMax(void){
 				
 				case 90:
 					if(isFirstMax(magArray[i][j],magArray[i][j+1],magArray[i][j-1])){
-						imageArray[i][j] = 0; // black
+						imageArray[i][j] = 0.0; // black
 					}
 					else{
-						imageArray[i][j] = 255; // white
+						imageArray[i][j] = 255.0; // white
 					}
 				break;
 				
 				case 135:
 					if(isFirstMax(magArray[i][j],magArray[i+1][j-1],magArray[i-1][j+1])){
-						imageArray[i][j] = 0; // black
+						imageArray[i][j] = 0.0; // black
 					}
 					else{
-						imageArray[i][j] = 255; // white
+						imageArray[i][j] = 255.0; // white
 					}
 				break;
 				
@@ -424,8 +302,447 @@ void noMax(void){
 	}
 }
 
+//*****************************
+//non-maximum suppression 
+//depending on the orientation, pixels are either thrown away or accepted
+//by checking it's neighbors
+//*****************************
+void noMax2(void){
+	int theta = 0;
+	int i=0, j=0;
+	int acumFilas=1, acumColumnas=1, filas=ROWS-1, columnas=COLUMNS-1;
+	
+	for( int j=1 ; j < ROWS-1 ; j++)
+	 {
+	    for( int i=1 ; i < COLUMNS-1 ; i++)
+	     {
+			 __asm{
+				 while1:
+					mov eax, filas
+					mov ebx, acumFilas
+					cmp eax, ebx
+					jge finwhile
+					
+					while2:
+						mov eax, columnas
+						mov ebx, acumColumnas
+						cmp eax, ebx
+						jge finwhile
+					
+					
 
-  
+			 }
+			theta = (int) thetas[i][j];
+			int bandera1=1;
+			int bandera2=1;
+			int n_255=255;
+			int n_0=0;
+			int n_45=45;
+			int n_90=90;
+			int n_135=135;
+			double basura;
+
+			//switch(theta){
+				//case 0:
+					
+
+
+//////ESTE ES EL PRIMER IF :D					
+///////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+					__asm{
+
+						mov eax, theta
+						mov ebx, n_0
+						cmp eax, ebx
+						je caso0   ; COMPARA TETHA CON 0 PARA ENTRAR AL PRIMER CASO
+
+						
+						mov ebx, n_45
+						cmp eax, ebx
+						je caso45   ; COMPARA TETHA CON 45 PARA ENTRAR AL PRIMER CASO
+
+
+						mov ebx, n_90
+						cmp eax, ebx
+						je caso90   ; COMPARA TETHA CON 90 PARA ENTRAR AL PRIMER CASO
+
+						mov ebx, n_135
+						cmp eax, ebx
+						je caso135   ; COMPARA TETHA CON 0 PARA ENTRAR AL PRIMER CASO
+
+
+						caso0:
+						finit
+					mov esi, i
+					mov edi, j
+					mov edx, type magArray
+					imul edi, type double
+					imul esi, edx
+					fld [qword ptr magArray +esi+edi]  ;Apilo magArray[i][j]
+
+					mov esi, i
+					inc esi
+					mov edi, j
+					mov edx, type magArray
+					imul edi, type double
+					imul esi, edx
+					fld [qword ptr magArray +esi+edi]  ;Apilo magArray[i+1][j]
+
+
+					;/////////COMPARACION
+					fcomi ST(0), ST(1)
+					jge no_comparacion
+					mov bandera1, 0
+					fstp basura
+
+					mov esi, i
+					dec esi
+					mov edi, j
+					mov edx, type magArray
+					imul edi, type double
+					imul esi, edx
+					fld [qword ptr magArray +esi+edi]  ;Apilo magArray[i-1][j]
+
+					//COMPARACION 2
+					fcomi ST(0), ST(1)
+					jge no_comparacion
+					mov bandera2, 0
+					fstp basura
+
+					finit
+					fldz   ;cargo el cero
+
+					mov esi, i
+					mov edi, j
+					mov edx, type imageArray
+					imul edi, type double
+					imul esi, edx
+					fstp [qword ptr imageArray +esi+edi]  ;igualo imageArray[i][j]=0
+					
+					mov bandera1, 1  ; muevo la bandera a 1 otra vez
+					mov bandera2, 1  ; muevo la bandera a 1 otra vez
+					jmp finswitch
+					no_comparacion: ;else
+
+					finit
+					
+					
+					fild n_255
+					mov esi, i
+					mov edi, j
+					mov edx, type imageArray
+					imul edi, type double
+					imul esi, edx
+					fstp [qword ptr imageArray +esi+edi]  ;igualo imageArray[i][j]=255
+
+					mov bandera1, 1  ; muevo la bandera a 1 otra vez
+					mov bandera2, 1  ; muevo la bandera a 1 otra vez
+					jmp finswitch
+					}
+					///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+					/*
+					if(isFirstMax(magArray[i][j],magArray[i+1][j],magArray[i-1][j])){
+						imageArray[i][j] = 0; // black
+					}
+					else{
+						imageArray[i][j] = 255; // white
+					}*/
+				//break;
+				
+				//case 45:
+
+					
+
+//////ESTE ES EL PRIMER IF :D					
+///////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+					__asm{
+
+						caso45:
+						finit
+					mov esi, i
+					mov edi, j
+					mov edx, type magArray
+					imul edi, type double
+					imul esi, edx
+					fld [qword ptr magArray +esi+edi]  ;Apilo magArray[i][j]
+
+					mov esi, i
+					inc esi
+					mov edi, j
+					inc edi
+					mov edx, type magArray
+					imul edi, type double
+					imul esi, edx
+					fld [qword ptr magArray +esi+edi]  ;Apilo magArray[i+1][j+1]
+
+
+					;/////////COMPARACION
+					fcomi ST(0), ST(1)
+					jge no_comparacion2
+					mov bandera1, 0
+					fstp basura
+
+					mov esi, i
+					dec esi
+					mov edi, j
+					dec esi
+					mov edx, type magArray
+					imul edi, type double
+					imul esi, edx
+					fld [qword ptr magArray +esi+edi]  ;Apilo magArray[i-1][j-1]
+
+					//COMPARACION 2
+					fcomi ST(0), ST(1)
+					jge no_comparacion2
+					mov bandera2, 0
+					fstp basura
+
+					finit
+					fldz   ;cargo el cero
+
+					mov esi, i
+					mov edi, j
+					mov edx, type imageArray
+					imul edi, type double
+					imul esi, edx
+					fstp [qword ptr imageArray +esi+edi]  ;igualo imageArray[i][j]=0
+					
+					mov bandera1, 1  ; muevo la bandera a 1 otra vez
+					mov bandera2, 1  ; muevo la bandera a 1 otra vez
+					jmp finswitch
+					no_comparacion2: ;else
+
+					finit
+					
+					
+					fild n_255
+					mov esi, i
+					mov edi, j
+					mov edx, type imageArray
+					imul edi, type double
+					imul esi, edx
+					fstp [qword ptr imageArray +esi+edi]  ;igualo imageArray[i][j]=255
+
+					mov bandera1, 1  ; muevo la bandera a 1 otra vez
+					mov bandera2, 1  ; muevo la bandera a 1 otra vez
+					jmp finswitch
+					}
+					///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+					/*
+					if(isFirstMax(magArray[i][j],magArray[i+1][j+1],magArray[i-1][j-1])){
+						imageArray[i][j] = 0; // black
+					}
+					else{
+						imageArray[i][j] = 255; // white
+					}*/
+				
+				//break;
+				
+				//case 90:
+
+
+					
+
+//////ESTE ES EL TERCER IF :D					
+///////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+					__asm{
+						caso90:
+						finit
+					mov esi, i
+					mov edi, j
+					mov edx, type magArray
+					imul edi, type double
+					imul esi, edx
+					fld [qword ptr magArray +esi+edi]  ;Apilo magArray[i][j]
+
+					mov esi, i
+					
+					mov edi, j
+					inc edi
+					mov edx, type magArray
+					imul edi, type double
+					imul esi, edx
+					fld [qword ptr magArray +esi+edi]  ;Apilo magArray[i][j+1]
+
+
+					;/////////COMPARACION
+					fcomi ST(0), ST(1)
+					jge no_comparacion3
+					mov bandera1, 0
+					fstp basura
+
+					mov esi, i
+					
+					mov edi, j
+					dec edi
+					mov edx, type magArray
+					imul edi, type double
+					imul esi, edx
+					fld [qword ptr magArray +esi+edi]  ;Apilo magArray[i][j-1]
+
+					//COMPARACION 2
+					fcomi ST(0), ST(1)
+					jge no_comparacion3
+					mov bandera2, 0
+					fstp basura
+
+					finit
+					fldz   ;cargo el cero
+
+					mov esi, i
+					mov edi, j
+					mov edx, type imageArray
+					imul edi, type double
+					imul esi, edx
+					fstp [qword ptr imageArray +esi+edi]  ;igualo imageArray[i][j]=0
+					
+					mov bandera1, 1  ; muevo la bandera a 1 otra vez
+					mov bandera2, 1  ; muevo la bandera a 1 otra vez
+					jmp finswitch
+					no_comparacion3: ;else
+
+					finit
+					
+					
+					fild n_255
+					mov esi, i
+					mov edi, j
+					mov edx, type imageArray
+					imul edi, type double
+					imul esi, edx
+					fstp [qword ptr imageArray +esi+edi]  ;igualo imageArray[i][j]=255
+
+					mov bandera1, 1  ; muevo la bandera a 1 otra vez
+					mov bandera2, 1  ; muevo la bandera a 1 otra vez
+					jmp finswitch
+					}
+					///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+					/*
+					if(isFirstMax(magArray[i][j],magArray[i][j+1],magArray[i][j-1])){
+						imageArray[i][j] = 0; // black
+					}
+					else{
+						imageArray[i][j] = 255; // white
+					}*/
+				//break;
+				
+				//case 135:
+					
+
+//////ESTE ES EL PRIMER IF :D					
+///////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+					__asm{
+						caso135:
+						finit
+					mov esi, i
+					mov edi, j
+					mov edx, type magArray
+					imul edi, type double
+					imul esi, edx
+					fld [qword ptr magArray +esi+edi]  ;Apilo magArray[i][j]
+
+					mov esi, i
+					inc esi
+					mov edi, j
+					dec edi
+					mov edx, type magArray
+					imul edi, type double
+					imul esi, edx
+					fld [qword ptr magArray +esi+edi]  ;Apilo magArray[i+1][j-1]
+
+
+					;/////////COMPARACION
+					fcomi ST(0), ST(1)
+					jge no_comparacion4
+					mov bandera1, 0
+					fstp basura
+
+					mov esi, i
+					dec esi
+					mov edi, j
+					inc edi
+					mov edx, type magArray
+					imul edi, type double
+					imul esi, edx
+					fld [qword ptr magArray +esi+edi]  ;Apilo magArray[i-1][j+1]
+
+					//COMPARACION 2
+					fcomi ST(0), ST(1)
+					jge no_comparacion4
+					mov bandera2, 0
+					fstp basura
+
+					finit
+					fldz   ;cargo el cero
+
+					mov esi, i
+					mov edi, j
+					mov edx, type imageArray
+					imul edi, type double
+					imul esi, edx
+					fstp [qword ptr imageArray +esi+edi]  ;igualo imageArray[i][j]=0
+					
+					mov bandera1, 1  ; muevo la bandera a 1 otra vez
+					mov bandera2, 1  ; muevo la bandera a 1 otra vez
+					no_comparacion4: ;else
+
+					finit
+					
+					
+					fild n_255
+					mov esi, i
+					mov edi, j
+					mov edx, type imageArray
+					imul edi, type double
+					imul esi, edx
+					fstp [qword ptr imageArray +esi+edi]  ;igualo imageArray[i][j]=255
+
+					mov bandera1, 1  ; muevo la bandera a 1 otra vez
+					mov bandera2, 1  ; muevo la bandera a 1 otra vez
+					
+					finswitch:
+						mov ebx, acumColumnas
+						inc ebx
+						mov acumColumnas, ebx
+
+					finwhile2:
+
+						mov eax, acumFilas
+						inc eax
+						mov acumFilas, eax
+
+				finwhile:
+					}
+					///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+					/*
+					if(isFirstMax(magArray[i][j],magArray[i+1][j-1],magArray[i-1][j+1])){
+						imageArray[i][j] = 0; // black
+					}
+					else{
+						imageArray[i][j] = 255; // white
+					}*/
+				//break;
+				
+				//default:
+				  //	cout << "error in nomax()"<< endl;
+				//break;
+			//}
+		}
+	}
+}
+
 //*******************************
 //hysteresis noise filter makes lines continuous and filters out the noise
 // see the pdf that we used to understand this step in english (Step 5)
@@ -433,55 +750,6 @@ void noMax(void){
   void hysteresis(void){
     bool greaterFound;
     bool betweenFound;
-
-//creo un auxiliar para la matriz
-	float auxMatriz[ROWS*COLUMNS];
-	for (int k=1, k<ROWS-1;k++){
-		for(int p=1; p<COLUMNS-1;p++){
-			auxMatriz[(p*k)+k]=(float)magArray[p][k];
-		}
-	
-	}
-
-	/*
-	int guardaEcx=0;
-	int guardaEsi=0;
-	int valorEsi=0;
-
-	//fist para retornar un entetro
-	
-
-	
-	__asm{
-	mov eax, ROWS
-	sub eax,2
-	mov ecx,eax
-	mov esi,2
-
-	for1:
-		mov guardaEcx, ecx
-		mov guardaEsi, esi
-;****asigno valor a a clumna
-		mov eax, COLUMNS
-		sub eax,2
-		mov ecx,eax
-		mov esi,2
-		mov valorEsi, esi
-		for2:
-			
-			fcomi 
-			
-			inc esi
-		loop for2
-
-		inc esi
-	loop for1
-
-
-    }*/
-
-
-
         for( int j=2 ; j < ROWS-2 ; j++){
 	   for( int i=2 ; i < COLUMNS-2 ; i++){
 	       if(magArray[i][j] < T_LOW){
@@ -528,16 +796,218 @@ void noMax(void){
 
 
 
+  void hysteresis2(void){
+	   doscincuenta=255.0;
+	  T_LOWA=65;
+	  T_HIGHA=80;
+	  cout<<"ROWS-2 "<<ROWS-2<<endl;
+	  cout<<"COLUMNS-2 "<<COLUMNS-2<<endl;
+	  _asm{
+		  mov j,2
+while1:
+	  }
+	  cout<<"j "<<j<<endl;
+	  _asm{
+	mov eax,j
+	mov ebx,ROWS
+	sub ebx,2
+	cmp eax,ebx
+	jge finwhile1
+	mov i,2 ;NO OLVIDAR DECLARAR I Y J en c++
+while2:
+	  }
+	  cout<<"i "<<i<<endl;
+	  _asm{
+		mov eax,i
+		mov ebx,COLUMNS
+		sub ebx,2
+		cmp eax,ebx
+		;jmp finwhile2
+		jge finwhile2
+		;mov eax,500
+		
+			mov esi,i
+		mov edi,j
+		mov edx,type magArray
+		imul edi,type double //multiplicar edi por el tipo del dato del arreglo
+		imul esi,edx
+		;fild T_LOWA
+		;fld [qword ptr magArray +esi+edi]
+		;fcomi ST(0),ST(1)
+		;jge finsi1
+		;finit
+		;fld doscincuenta ;OJOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+		;fstp [qword ptr magArray +esi+edi]
+		;finsi1:
+		
+	  }
+	  if(magArray[i][j]<T_LOW){
+		  imageArray[i][j]=255;
+	  }
+	  if(magArray[i][j]>T_HIGH){
+		  imageArray[i][j]=0;
+	  }
+	  _asm{
+		
+		fild T_LOWA
+		fld [qword ptr magArray +esi+edi]
+		fcomi ST(0),ST(1)
+		jl finsi3
+		finit
+		fild T_HIGHA
+		fld [qword ptr magArray +esi+edi]
+		fcomi ST(0),ST(1)
+		jg finsi3
+		mov greaterFounda,0
+		mov betweenFounda,0 ;NO OLVIDAR DECLARAR ESTAS DOS
+		mov eax,0  
+		sub eax,1
+		mov m,eax  ; no olvidar declarar m
+		while3:
+		mov eax,m
+		mov ebx,2
+		cmp eax,ebx
+		jge finwhile3
+		
+		mov eax,0  
+		sub eax,1
+		mov n,eax  ; no olvidar declarar m
+		while4:
+		mov eax,n
+		mov ebx,2
+		cmp eax,ebx
+		jge finwhile4
+		
+		mov eax,i
+		add eax,m
+		mov esi,eax
+		mov edx,type magArray
+		imul esi,edx
+		mov eax,j
+		add eax,n
+		mov edi,eax
+		imul edi,type double
+		finit
+		fild T_HIGHA
+		fld [qword ptr magArray +esi+edi]
+		fcomi ST(0),ST(1)
+		jle finsi4
+		mov esi,i
+		mov edi,j
+		mov edx,type imageArray
+		imul edi,type double //multiplicar edi por el tipo del dato del arreglo
+		imul esi,edx
+		finit
+		fldz
+		fstp [qword ptr imageArray +esi+edi]
+		mov greaterFounda,1
+		finsi4:
+		
+		
+		mov esi,i
+		mov edi,j
+		mov edx,type magArray
+		imul edi,type double //multiplicar edi por el tipo del dato del arreglo
+		imul esi,edx
+		fild T_LOWA
+		fld [qword ptr magArray +esi+edi]
+		fcomi ST(0),ST(1)
+		jle finsi5
+		finit
+		fild T_HIGHA
+		fld [qword ptr magArray +esi+edi]
+		fcomi ST(0),ST(1)
+		jge finsi5
+		mov betweenFounda,1
+		
+		finsi5:
+		
+		inc n
+		jmp while4
+		finwhile4:
+		inc m
+		jmp while3
+		finwhile3:
+		
+		
+		mov eax,0
+		cmp eax,greaterFounda
+		jl finsi6
+		mov eax,1
+		cmp eax,betweenFounda
+		jg finsi6
+		;*******************************************
+		
+		
+		mov eax,0  
+		sub eax,2
+		mov m,eax  ; no olvidar declarar m
+		while5:
+		mov eax,m
+		mov ebx,3
+		cmp eax,ebx
+		jge finwhile5
+		
+		mov eax,0  
+		sub eax,2
+		mov n,eax  ; no olvidar declarar m
+		while6:
+		mov eax,n
+		mov ebx,3
+		cmp eax,ebx
+		jge finwhile6
+		
+		mov eax,i
+		add eax,m
+		mov esi,eax
+		mov edx,type magArray
+		imul esi,edx
+		mov eax,j
+		add eax,n
+		mov edi,eax
+		imul edi,type double
+		finit
+		fild T_HIGHA
+		fld [qword ptr magArray +esi+edi]
+		fcomi ST(0),ST(1)
+		jle finsi7
+		
+		mov greaterFounda,1
+		finsi7:
+		
+		
+		
+		
+		inc n
+		jmp while6
+		finwhile6:
+		inc m
+		jmp while5
+		finwhile5:
+		
+		
+		;*******************************************
+		finsi6:
+		
+		
+		finsi3:
+		
+		
+		;///////////////////////////////////////////////////////////////////////
 
-/*HWND sHwnd;
- 
-void SetWindowHandle(HWND hwnd){
-    sHwnd= hwnd;
-}*/
-
-// **********
-// class CRaster
-//   - Clase generica para imagenes BMP raster.
+		
+		
+		inc i
+		jmp while2
+	finwhile2:
+	inc j
+	  }
+	 // cout<<"i "<<i<<endl;
+	  _asm{
+	jmp while1
+finwhile1:
+	  }
+  }
 class CRaster {
 	public:
 		int Width,Height;		// Dimensiones
@@ -702,15 +1172,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_COMMAND:
 		if(examinar == (HWND)lParam){
-	
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////AQUI COMENIZA LA FUNCION DEL BOTON EXAMINAR//////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 			bmp.AbrirArchivo(hWnd);
 			if(bandera){
@@ -726,26 +1187,95 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				bmp.GDIPaint (hdc,130,20,0,0);
 				// Se recorre la imagen y se lee el color del punto, si es negro (0 = RGB(0,0,0))
 				// Se pinta con rojo (1000), sino, se deja intacto
+				ROWS=bmp.Height; // Altura de la Imagen
+				COLUMNS=bmp.Width; // Ancho de la Imagen
+
+				//allocate Memory
+				imageArray = new double *[COLUMNS] ; // row memory allocation
+				for( int i = 0 ; i < COLUMNS ; i++ ){ // column memory allocation
+				imageArray[i] = new double[ROWS];
+				}
+				imageArray2 = new double *[COLUMNS] ; // row memory allocation
+				for( int i = 0 ; i < COLUMNS ; i++ ){ // column memory allocation
+				imageArray2[i] = new double[ROWS];
+				}
+
+				thetas = new double *[COLUMNS];
+				for(int i = 0; i < COLUMNS; i++) {
+				thetas[i] = new double[ROWS];
+				}
+
 				
-				///////////////AQUI ESTOY CHIMBIANDO
-				/*
-				M=bmp.Height; // Altura de la Imagen
-				N=bmp.Width; // Ancho de la Imagen
+				magArray = new double *[COLUMNS];
+				for(int i=0; i < COLUMNS; i++) {
+				magArray[i] = new double[ROWS];
+				}
 				
-				r_m_n = sqrt((double)(N*M));	// Valor necesario para cálculo de la transformada (Raiz cuadrada del área de la imagen).
-				for (f=0;f<M;f++) // Primer ciclo para llenado de las Matrices dt y dot
+				int Temp;
+				//r_m_n = sqrt((double)(N*M));	// Valor necesario para cálculo de la transformada (Raiz cuadrada del área de la imagen).
+				for (f=0;f<ROWS;f++) // Primer ciclo para llenado de las Matrices dt y dot
 				{
-					for (g=0;g<N;g++) // Segundo ciclo para llenado de las Matrices dt y dot
+					for (g=0;g<COLUMNS;g++) // Segundo ciclo para llenado de las Matrices dt y dot
 					{
 						cl=GetPixel(hdc,g+130,f+20);	// Función para obtener el pixel en la posición dada
 						B=GetBValue(cl);			// Valor o cantidad de azul en el pixel
 						R=GetRValue(cl);			// Valor o cantidad de rojo en el pixel
 						G=GetGValue(cl);			// Valor o cantidad de verde en el pixel
-						dt[f][g]=(float)(((0.3*(float)R+0.59*(float)G+0.11*(float)B))*(float)(pow(-1.0,(double)(f+g))));		// Cálculo del valor en cada posición de la matriz dt
-						dot[f][g]=(float)(((0.3*(float)R+0.59*(float)G+0.11*(float)B))*(float)(pow(-1.0,(double)(f+g))));		// Cálculo del valor en cada posición de la matriz dot (para uso en assembler)
+						Temp=(int)(((0.299*(float)R+0.587*(float)G+0.114*(float)B)));		// Cálculo del valor en cada posición de la matriz dt
+						//dot[f][g]=(float)(((0.3*(float)R+0.59*(float)G+0.11*(float)B))*(float)(pow(-1.0,(double)(f+g))));		// Cálculo del valor en cada posición de la matriz dot (para uso en assembler)
+						imageArray[g][f] = Temp;
+						imageArray2[g][f] = Temp;
 					}
 				}
-
+				gaussianBlur();
+				sobel();
+				noMax();
+				hysteresis();
+					for (f=0;f<ROWS;f++)
+				{
+					for (g=0;g<COLUMNS;g++)
+					{
+						SetPixel(hdc,f+M+330,g+N+40,RGB((int)imageArray[f][g],(int)imageArray[f][g],(int)imageArray[f][g]));
+						//SetPixel(hdc,f+2*M+350,g+N+40,RGB((int)(fabs(Qra[f][g])),(int)(fabs(Qra[f][g])),(int)(fabs(Qra[f][g]))));
+						//SetPixel(hdc,f+3*M+370,g+N+40,RGB((int)(fabs(Qia[f][g])),(int)(fabs(Qia[f][g])),(int)(fabs(Qia[f][g]))));
+					}
+				}
+				//outputImg();
+				imageArray = new double *[COLUMNS] ; // row memory allocation
+				for( int i = 0 ; i < COLUMNS ; i++ ){ // column memory allocation
+				imageArray[i] = new double[ROWS];
+				}
+				thetas = new double *[COLUMNS];
+				for(int i = 0; i < COLUMNS; i++) {
+				thetas[i] = new double[ROWS];
+				}
+				magArray = new double *[COLUMNS];
+				for(int i=0; i < COLUMNS; i++) {
+				magArray[i] = new double[ROWS];
+				}
+				for (f=0;f<ROWS;f++) // Primer ciclo para llenado de las Matrices dt y dot
+				{
+					for (g=0;g<COLUMNS;g++) // Segundo ciclo para llenado de las Matrices dt y dot
+					{
+						
+						imageArray[g][f] = imageArray2[g][f];
+						
+					}
+				}
+				gaussianBlur();
+				sobel();
+				noMax2();
+				hysteresis2();
+					for (f=0;f<ROWS;f++)
+				{
+					for (g=0;g<COLUMNS;g++)
+					{
+						SetPixel(hdc,f+M+550,g+N+40,RGB((int)imageArray[f][g],(int)imageArray[f][g],(int)imageArray[f][g]));
+						//SetPixel(hdc,f+2*M+350,g+N+40,RGB((int)(fabs(Qra[f][g])),(int)(fabs(Qra[f][g])),(int)(fabs(Qra[f][g]))));
+						//SetPixel(hdc,f+3*M+370,g+N+40,RGB((int)(fabs(Qia[f][g])),(int)(fabs(Qia[f][g])),(int)(fabs(Qia[f][g]))));
+					}
+				}
+				/*
 				tc= clock(); // Se inicia a tomar el tiempo que demora haciendo el cálculo
 		
 				for (f=0;f<M;f++) // Primer Ciclo para manejo de las matrices Qr(real), Qi(imaginaria), Qm(módulo)
@@ -997,18 +1527,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					<<"Diferencia: "<<abs(TiempoC-TiempoAssembly)<<" milisegundos"; 
 
 				MessageBox(NULL,TIEMPOS.str().c_str(),_T("Tiempos"),NULL);
-
-				
-*/
-
-EndPaint(hWnd, &ps);
-			}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//AQUI TERMINAN LOS CALCULOS Y TODO EL PROCESO
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		
+				*/
+				EndPaint(hWnd, &ps);
+		}
 		}else if(Salir == (HWND)lParam){
 			DestroyWindow(hWnd);
 		}else if(Instruc == (HWND)lParam){
@@ -1039,6 +1560,7 @@ EndPaint(hWnd, &ps);
 
     return 0;
 }
+
 
 // **********
 // CRaster::LoadBMPFile (FileName);
