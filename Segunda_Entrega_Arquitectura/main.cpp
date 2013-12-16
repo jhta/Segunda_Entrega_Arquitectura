@@ -16,13 +16,18 @@
 using namespace std;
 
 
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//					DEFINICION DE VARIABLES Y FUNCIONES
+//WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+//Variables definidas
 #define pi_2 (4.0 * asin(1.0))
-
 #define MAX_SIZE 5
 #define PI 3.14159
 #define T_LOW 65
 #define T_HIGH 80
 HINSTANCE iniciar;
+
+//Definicion de funciones
 int importImg(char*);
 void outputImg(void);
 void printFileInfo(BMP);
@@ -36,7 +41,7 @@ bool isFirstMax(double , double , double );
 int getOrientation(float);
 bool isBetween(float, float, float, float, float);
 
-
+//Variables Globales
 int T_LOWA;
 int T_HIGHA;
 int i,j,m,n;
@@ -66,7 +71,7 @@ double dt[1024][1024],Qr[1024][1024],Qi[1024][1024],Qm[1024][1024];
 static TCHAR szWindowClass[] = _T("BMPLoad");
 
 // The string that appears in the application's title bar.
-static TCHAR szTitle[] = _T("Transformada Bidimensional Discreta de Fourier");
+static TCHAR szTitle[] = _T("Algoritmo Canny Edge");
 
 HINSTANCE hInst;
 
@@ -93,10 +98,18 @@ void SetWindowHandle(HWND hwnd){
 // class CRaster
 //   - Clase generica para imagenes BMP raster.
 void printFileInfo(BMP image){
-  cout << endl << "File info:" << endl;
+	  cout << endl << "File info:" << endl;
   cout << image.TellWidth() << " x " << image.TellHeight()
        << " at " << image.TellBitDepth() << " bpp" << endl << endl;
 }
+
+
+
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//					FUNCIONES PARA IMPLEMENTACION DE SOBEL Y CANNY
+//WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+
+//fUNCION PARA MODIFICAR ARCHIVVO
 void outputImg(void){
   //setup Output IMG
   BMP OutputIMG;
@@ -307,6 +320,11 @@ void noMax(void){
 //depending on the orientation, pixels are either thrown away or accepted
 //by checking it's neighbors
 //*****************************
+
+
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//					ALGORITMO EN ENSAMBLADOR DE LA FUNCION NOMAX
+//WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
 void noMax2(void){
 	int theta = 0;
 	int i=0, j=0;
@@ -322,7 +340,7 @@ void noMax2(void){
 					mov ebx, acumFilas
 					cmp eax, ebx
 					jge finwhile
-					
+;////////////////////WHILE QUE RECORRE LA MATRIZ
 					while2:
 						mov eax, columnas
 						mov ebx, acumColumnas
@@ -343,7 +361,7 @@ void noMax2(void){
 			double basura;
 		
 
-//////ESTE ES EL PRIMER IF :D					
+//////ARRANCA CODIGO CON UN SWITCH, EL CUAL MANEJAMOS CON ETIQUETAS
 ///////////////////////////////////////////////////
 /////////////////////////////////////////////////////
 					__asm{
@@ -400,7 +418,7 @@ void noMax2(void){
 					imul esi, edx
 					fld [qword ptr magArray +esi+edi]  ;Apilo magArray[i-1][j]
 
-					//COMPARACION 2
+					;//COMPARACION 2
 					fcomi ST(0), ST(1)
 					jge no_comparacion
 					mov bandera2, 0
@@ -439,7 +457,7 @@ void noMax2(void){
 					///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-//////ESTE ES EL PRIMER IF :D					
+//////eN CASO DE QUE SEA DE 45 GRADOS			
 ///////////////////////////////////////////////////
 /////////////////////////////////////////////////////
 					__asm{
@@ -478,7 +496,7 @@ void noMax2(void){
 					imul esi, edx
 					fld [qword ptr magArray +esi+edi]  ;Apilo magArray[i-1][j-1]
 
-					//COMPARACION 2
+					;//COMPARACION 2
 					fcomi ST(0), ST(1)
 					jge no_comparacion2
 					mov bandera2, 0
@@ -519,7 +537,7 @@ void noMax2(void){
 
 					
 
-//////ESTE ES EL TERCER IF :D					
+//////ENN CASO DE QUE SEA DE 90 GRADOS					
 ///////////////////////////////////////////////////
 /////////////////////////////////////////////////////
 					__asm{
@@ -557,7 +575,7 @@ void noMax2(void){
 					imul esi, edx
 					fld [qword ptr magArray +esi+edi]  ;Apilo magArray[i][j-1]
 
-					//COMPARACION 2
+					;//COMPARACION 2
 					fcomi ST(0), ST(1)
 					jge no_comparacion3
 					mov bandera2, 0
@@ -598,7 +616,7 @@ void noMax2(void){
 
 	
 
-//////ESTE ES EL PRIMER IF :D					
+//////EN CASO DE QUE SEA DE 135 GRADOS					
 ///////////////////////////////////////////////////
 /////////////////////////////////////////////////////
 					__asm{
@@ -636,7 +654,7 @@ void noMax2(void){
 					imul esi, edx
 					fld [qword ptr magArray +esi+edi]  ;Apilo magArray[i-1][j+1]
 
-					//COMPARACION 2
+					;//COMPARACION 2
 					fcomi ST(0), ST(1)
 					jge no_comparacion4
 					mov bandera2, 0
@@ -742,6 +760,9 @@ void noMax2(void){
   }	
 
 
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//					FUNCION HYSTERESIS EN ENSAMBLADOR
+//WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
 
   void hysteresis2(void){
 	   doscincuenta=255.0;
@@ -776,7 +797,7 @@ while2:
 			mov esi,i
 		mov edi,j
 		mov edx,type magArray
-		imul edi,type double //multiplicar edi por el tipo del dato del arreglo
+		imul edi,type double ;//multiplicar edi por el tipo del dato del arreglo
 		imul esi,edx
 		;fild T_LOWA
 		;fld [qword ptr magArray +esi+edi]
@@ -995,13 +1016,6 @@ int WINAPI WinMain(HINSTANCE hInstance,
     wcex.lpszClassName  = szWindowClass;
     wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_APPLICATION));
 
-  /*							//CONSOLA DE WINDOWS, BORRAR ANTES DE FINALIZAR EL TRABAJO 
-  //Borrar LUEGO
-     AllocConsole() ;
-  AttachConsole( GetCurrentProcessId() ) ;
-  freopen( "CON", "w", stdout ) ;
-  printf("HELLO!!! I AM THE CONSOLE!" ) ;*/
-
     if (!RegisterClassEx(&wcex))
     {
         MessageBox(NULL,
@@ -1014,16 +1028,6 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
     hInst = hInstance; // Store instance handle in our global variable
 
-    // The parameters to CreateWindow explained:
-    // szWindowClass: the name of the application
-    // szTitle: the text that appears in the title bar
-    // WS_OVERLAPPEDWINDOW: the type of window to create
-    // CW_USEDEFAULT, CW_USEDEFAULT: initial position (x, y)
-    // 500, 100: initial size (width, length)
-    // NULL: the parent of this window
-    // NULL: this application does not have a menu bar
-    // hInstance: the first parameter from WinMain
-    // NULL: not used in this application
     HWND hWnd = CreateWindow(
         szWindowClass,
         szTitle,
@@ -1072,6 +1076,12 @@ int WINAPI WinMain(HINSTANCE hInstance,
 //  WM_DESTROY  - post a quit message and return
 //
 //
+
+
+//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+//					FUNCION DONDE SE INICIA Y SE REALIZA EL PROCESO DE DIBUJO
+//WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     PAINTSTRUCT ps;
@@ -1096,6 +1106,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	wstringstream TIEMPOS;
 
     TCHAR greeting[] = _T("Algoritmo Canny Edge");
+	//vARIABLES PARA IMPRIMIR LABELS
 	static HWND hwndDireccion ;
 	static HWND hwndBienvenida ;
 	//static HWND iniciar ;
@@ -1103,6 +1114,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
 	case WM_CREATE:
 
+		//MENSAJE DE INSTRUCCIONES
 		hwndDireccion = CreateWindow(L"EDIT", L"		INSTRUCCIONES: ", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 50, 410, 20, hWnd, 0, iniciar, NULL);
 		hwndDireccion = CreateWindow(L"EDIT", L"____________________________________________________________", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 70, 410, 20, hWnd, 0, iniciar, NULL);
 		hwndDireccion = CreateWindow(L"EDIT", L" La función del presente programa es por medio del algoritmo", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 90, 410, 20, hWnd, 0, iniciar, NULL);
@@ -1119,7 +1131,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		
 		
 		
-		
+		//MENSAJE DE INFORMACION
 		hwndBienvenida = CreateWindow(L"EDIT", L"  DETECTOR DE BORDES CON ALGORITMO DE CANNY EDGE  ", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 350, 410, 20, hWnd, 0, iniciar, NULL);
 		hwndBienvenida = CreateWindow(L"EDIT", L"__________________________________________________", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 370, 410, 20, hWnd, 0, iniciar, NULL);
 		hwndBienvenida = CreateWindow(L"EDIT", L" Fecha de creación:  16/12/2013", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 390, 410, 20, hWnd, 0, iniciar, NULL);
@@ -1133,39 +1145,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		hwndBienvenida = CreateWindow(L"EDIT", L" Medellín", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 550, 410, 20, hWnd, 0, iniciar, NULL);
 		hwndBienvenida = CreateWindow(L"EDIT", L" ", WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_DISABLED, 900, 570, 410, 20, hWnd, 0, iniciar, NULL);
 		
-		
-		
-		
-		
-		
-		// Debe insertar la función para buscar archivos (Filtro BMP)
-		// y usarlo como parametro en la función siguiente, como ejemplo pongo
-		// la imagen xy.bmp
-		
-
-
 
 		//Se crea un botón examinar
 		examinar = CreateWindow(L"BUTTON", L"Examinar", WS_TABSTOP|WS_VISIBLE|WS_CHILD|BS_DEFPUSHBUTTON|BS_MULTILINE,  
 								400,300, 100,38, hWnd, NULL, (HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE), NULL);
-		//Se crea un botón instrucciones para mostrar al usuariio como usar el programa
-		/*Instruc = CreateWindow(L"BUTTON", L"Instrucciones", WS_TABSTOP|WS_VISIBLE|WS_CHILD|BS_DEFPUSHBUTTON|BS_MULTILINE,  
-								260,300, 100,38, hWnd, NULL, (HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE), NULL);
-		// Se crea botón About, para dar información respecto al programa 
-		AcercaDe = CreateWindow(L"BUTTON", L"Acerca de", WS_TABSTOP|WS_VISIBLE|WS_CHILD|BS_DEFPUSHBUTTON|BS_MULTILINE,  
-								400,300, 100,38, hWnd, NULL, (HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE), NULL);
-		*/// se crea el botón salir, para salir del programa
+		/// se crea el botón salir, para salir del programa
 		Salir = CreateWindow(L"BUTTON", L"Salir", WS_TABSTOP|WS_VISIBLE|WS_CHILD|BS_DEFPUSHBUTTON|BS_MULTILINE,  
 								540,300, 100,38, hWnd, NULL, (HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE), NULL);
 		break;
 	case WM_COMMAND:
-		if(examinar == (HWND)lParam){
+		if(examinar == (HWND)lParam){ //SI PRESIONA EL BOTON DE EXAMINAR
 
 			bmp.AbrirArchivo(hWnd);
 			if(bandera){
 				bandera= false;
-				//MessageBox(hWnd,L"Sea paciente mientras se realizan los cálculos.", L"Please Wait",MB_OK+MB_ICONINFORMATION);
-
+				
 				GetClientRect(hWnd,&rect);
 				Rectangle((HDC)wParam,rect.left,rect.top,rect.right,rect.bottom);
 				InvalidateRect(hWnd,NULL,TRUE);
@@ -1233,7 +1227,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					for (f=0;f<ROWS;f++)
 				{
 					for (g=0;g<COLUMNS;g++)
-					{
+					{//PINTA LA IMAGEN CALCULADA CON C++
 						SetPixel(hdc,f+M+340,g+N+70,RGB((int)imageArray[f][g],(int)imageArray[f][g],(int)imageArray[f][g]));
 					}
 				}
@@ -1283,7 +1277,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					for (f=0;f<ROWS;f++)
 				{
 					for (g=0;g<COLUMNS;g++)
-					{
+					{//PINTA LA IMAGEN CALCULADA CON ASSAMBLY
 						SetPixel(hdc,f+M+550,g+N+70,RGB((int)imageArray[f][g],(int)imageArray[f][g],(int)imageArray[f][g]));
 					}
 				}
@@ -1293,7 +1287,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					<<"Tiempo ASM: "<<TiempoAssembly<<" milisegundos"<<endl
 					<<"Diferencia: "<<abs(TiempoC-TiempoAssembly)<<" milisegundos";
 
-
+				//MUESTRA LOS TIEMPOS
 				MessageBox(NULL,TIEMPOS.str().c_str(),_T("Tiempos"),NULL);
 				
 				
